@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
+import de.hdodenhof.circleimageview.CircleImageView
 
 class ProfileImageAdapter(private val context: Context, private val imageIds: Array<Int>) : BaseAdapter() {
 
@@ -21,14 +22,14 @@ class ProfileImageAdapter(private val context: Context, private val imageIds: Ar
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val imageView: ImageView
+        val imageView: CircleImageView
 
         if (convertView == null) {
-            imageView = ImageView(context)
+            imageView = CircleImageView(context)
             imageView.layoutParams = ViewGroup.LayoutParams(200, 200) // Size for grid items
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
         } else {
-            imageView = convertView as ImageView
+            imageView = convertView as CircleImageView
         }
 
         imageView.setImageResource(imageIds[position])

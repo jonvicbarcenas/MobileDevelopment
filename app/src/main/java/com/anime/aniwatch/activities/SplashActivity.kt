@@ -26,6 +26,7 @@ class SplashActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         checkForUpdate()
+        clearUserPref()
     }
 
     private fun checkForUpdate() {
@@ -103,5 +104,14 @@ class SplashActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }, 1500)
+    }
+
+    private fun clearUserPref() {
+        val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
+        sharedPreferences.edit()
+            .remove("username")
+            .remove("email")
+            .remove("profileImageRes")
+            .apply()
     }
 }

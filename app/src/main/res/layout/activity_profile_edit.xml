@@ -15,14 +15,16 @@
         android:layout_height="wrap_content"
         android:elevation="4dp"
         android:background="@color/black"
+        app:layout_constraintTop_toTopOf="parent"
         app:title="Edit Profile"
         app:titleTextColor="@android:color/white" />
 
     <!-- Scrollable content -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar">
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="703dp">
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_image"
                     android:layout_width="100dp"
                     android:layout_height="100dp"

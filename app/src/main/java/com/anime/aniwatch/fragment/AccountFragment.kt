@@ -3,7 +3,6 @@ package com.anime.aniwatch.fragment
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -33,6 +32,15 @@ class AccountFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var databaseReference: DatabaseReference
 
+    // Store user data at a higher scope for access in callbacks
+    private lateinit var userData: UserProfileData
+
+    // Constants for SharedPreferences
+    private val USER_PREFS = "userPrefs"
+    private val USERNAME_KEY = "username"
+    private val EMAIL_KEY = "email"
+    private val PROFILE_IMAGE_KEY = "profileImageRes"
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -48,33 +56,69 @@ class AccountFragment : Fragment() {
         val uid = auth.currentUser?.uid
         databaseReference = FirebaseDatabase.getInstance().getReference("Users")
 
-        val userEmail = auth.currentUser?.email
-        binding.email.text = userEmail ?: "No Email" // Display email as non-editable TextView
+        userData = loadUserDataFromLocal()
+
+        val userEmail = userData.email ?: auth.currentUser?.email
+        binding.email.text = userEmail ?: "No Email"
+
+        if (!userData.username.isNullOrEmpty()) {
+            binding.fullName.text = userData.username
+            Log.d("AccountFragment", "Using locally stored username: ${userData.username}")
+        } else {
+            binding.fullName.text = "Anonymous User"
+        }
+
+        binding.profile.setImageResource(userData.profileImageResId)
+        Log.d("AccountFragment", "Using locally stored profile image resource: ${userData.profileImageResId}")
 
         if (uid != null) {
-            // Fetch the latest username from Firebase Realtime Database
             databaseReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    if (!isAdded) {
+                        Log.d("AccountFragment", "Fragment not attached, skipping data update")
+                        return
+                    }
+
                     if (snapshot.exists()) {
                         val username = snapshot.child("username").getValue(String::class.java)
-                        Log.d("AccountFragment", "Fetched username: $username") // Log the fetched username
-                        binding.fullName.text = username ?: "Unknown User"  // Set the username in the TextView
+                        val email = snapshot.child("email").getValue(String::class.java)
+
+                        var profileImageResId: Int? = null
+                        if (snapshot.hasChild("profileImageRes")) {
+                            profileImageResId = snapshot.child("profileImageRes").getValue(Int::class.java)
+                        }
+
+                        Log.d("AccountFragment", "Fetched from Firebase: username=$username, email=$email, profileImageResId=$profileImageResId")
+
+                        saveUserDataLocally(username, email, profileImageResId)
+
+                        if (_binding != null) {
+                            // Update username if changed
+                            if (username != userData.username) {
+                                binding.fullName.text = username ?: "Unknown User"
+                            }
+
+                            if (email != userData.email && !email.isNullOrEmpty()) {
+                                binding.email.text = email
+                            }
+
+                            if (profileImageResId != null && profileImageResId != userData.profileImageResId) {
+                                binding.profile.setImageResource(profileImageResId)
+                                Log.d("AccountFragment", "Updated profile with image resource: $profileImageResId")
+                            }
+                        }
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(requireContext(), "Failed to load profile", Toast.LENGTH_SHORT).show()
+                    if (isAdded) {
+                        if (userData.username.isNullOrEmpty()) {
+                            Toast.makeText(requireContext(), "Failed to load profile", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             })
         }
-
-        // Load the saved profile image from SharedPreferences
-        val sharedPreferences = requireContext().getSharedPreferences("userPrefs", Context.MODE_PRIVATE)
-        val savedImageResId = sharedPreferences.getInt("profileImageRes", R.drawable.account)  // Default image if not set
-
-        // Set the image in the ImageView
-        val profileImageView: ImageView = binding.profile
-        profileImageView.setImageResource(savedImageResId)
 
         binding.editProfile.setOnClickListener {
             val intent = Intent(requireContext(), ProfileEditActivity::class.java)
@@ -105,61 +149,65 @@ class AccountFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == AppCompatActivity.RESULT_OK && requestCode == 100) {
-            // Get the updated username (if any)
             val updatedUsername = data?.getStringExtra("updatedUsername")
             val updatedEmail = data?.getStringExtra("updatedEmail")
 
             if (!updatedUsername.isNullOrEmpty()) {
-                binding.fullName.text = updatedUsername // Update the username in the UI
+                binding.fullName.text = updatedUsername
             }
 
-            // Update user profile
-            updateUserProfile(updatedUsername, updatedEmail)
-
-            // Handle the image update
             val imageResId = data?.getIntExtra("selectedImage", R.drawable.account) ?: R.drawable.account
-            val profileImageView: ImageView = binding.profile
-            profileImageView.setImageResource(imageResId)  // Set the selected image resource ID to the ImageView
+            binding.profile.setImageResource(imageResId)
+            updateUserProfile(updatedUsername, updatedEmail, imageResId)
         }
     }
 
-    private fun updateUserProfile(updatedUsername: String?, updatedEmail: String?) {
-        val user = auth.currentUser  // Declare 'user' once at the start
+    private fun updateUserProfile(updatedUsername: String?, updatedEmail: String?, profileImageResId: Int? = null) {
+        saveUserDataLocally(updatedUsername, updatedEmail, profileImageResId)
+        Log.d("AccountFragment", "Profile data saved locally first")
+
+        val user = auth.currentUser
         val uid = user?.uid
         if (uid != null) {
-            // Update Firebase Database with the new username and email
-            val userUpdates = mapOf<String, Any>(
+            val userUpdates = mutableMapOf<String, Any>(
                 "username" to updatedUsername.orEmpty(),
                 "email" to updatedEmail.orEmpty()
             )
+
+            if (profileImageResId != null) {
+                userUpdates["profileImageRes"] = profileImageResId
+            }
+
             databaseReference.child(uid).updateChildren(userUpdates).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(requireContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                    Log.d("AccountFragment", "Profile updated in Firebase Database")
                 } else {
-                    Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Failed to update profile online, but saved locally", Toast.LENGTH_SHORT).show()
+                    Log.e("AccountFragment", "Failed to update profile in Firebase: ${task.exception?.message}")
                 }
             }
         }
-
-        // Update Firebase Authentication user profile
         val profileUpdates = UserProfileChangeRequest.Builder()
             .setDisplayName(updatedUsername)
-            .setPhotoUri(null) // Keep this null unless you want to allow updating profile pictures
+            .setPhotoUri(null)
             .build()
 
         user?.updateProfile(profileUpdates)?.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Log.d("AccountFragment", "User profile updated.")
+                Log.d("AccountFragment", "User profile updated in Firebase Auth.")
+            } else {
+                Log.e("AccountFragment", "Failed to update profile in Firebase Auth: ${task.exception?.message}")
             }
         }
 
-        // Update the email if provided and is valid
         updatedEmail?.let {
             user?.updateEmail(it)?.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d("AccountFragment", "Email updated.")
+                    Log.d("AccountFragment", "Email updated in Firebase Auth.")
                 } else {
-                    Toast.makeText(requireContext(), "Failed to update email", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Failed to update email online, but saved locally", Toast.LENGTH_SHORT).show()
+                    Log.e("AccountFragment", "Failed to update email in Firebase Auth: ${task.exception?.message}")
                 }
             }
         }
@@ -184,7 +232,6 @@ class AccountFragment : Fragment() {
         dialog.show()
     }
 
-
     private fun logoutUser() {
         val sharedPreferences = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         val savedEmail = sharedPreferences.getString("email", "") ?: ""
@@ -206,9 +253,46 @@ class AccountFragment : Fragment() {
         startActivity(intent)
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    private fun saveUserDataLocally(username: String?, email: String?, profileImageResId: Int? = null) {
+        if (!isAdded) {
+            Log.d("AccountFragment", "Cannot save user data locally - fragment not attached to context")
+            return
+        }
+
+        try {
+            val sharedPreferences = requireContext().getSharedPreferences(USER_PREFS, Context.MODE_PRIVATE)
+            sharedPreferences.edit().apply {
+                username?.let { putString(USERNAME_KEY, it) }
+                email?.let { putString(EMAIL_KEY, it) }
+                profileImageResId?.let { putInt(PROFILE_IMAGE_KEY, it) }
+                apply()
+            }
+            Log.d("AccountFragment", "User data saved locally: username=$username, email=$email, profileImageResId=$profileImageResId")
+        } catch (e: IllegalStateException) {
+            Log.e("AccountFragment", "Failed to save user data locally: ${e.message}")
+        }
+    }
+
+    private fun loadUserDataFromLocal(): UserProfileData {
+        val sharedPreferences = requireContext().getSharedPreferences(USER_PREFS, Context.MODE_PRIVATE)
+        val username = sharedPreferences.getString(USERNAME_KEY, null)
+        val email = sharedPreferences.getString(EMAIL_KEY, null)
+        val profileImageResId = sharedPreferences.getInt(PROFILE_IMAGE_KEY, R.drawable.account)
+
+        Log.d("AccountFragment", "User data loaded from local: username=$username, email=$email, profileImageResId=$profileImageResId")
+
+        return UserProfileData(username, email, profileImageResId)
+    }
+
+    // Data class to hold user profile information
+    data class UserProfileData(
+        val username: String?,
+        val email: String?,
+        val profileImageResId: Int
+    )
 }
