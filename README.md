@@ -74,7 +74,7 @@ AniWatch is a feature-rich mobile application designed to enhance your anime-wat
 
 ## 📸 **Screenshots**
 
-| Home Screen | Watchlist Settings                 |
+| Home Screen | Watchlist Screen                   |
 |-------------|------------------------------------|
 | ![Home](app/jvb/home.jpg) | ![Security](app/jvb/watchlist.jpg) |
 
