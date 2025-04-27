@@ -15,21 +15,6 @@ import com.anime.aniwatch.player.FullscreenManager
 import com.anime.aniwatch.player.PlayerManager
 import com.anime.aniwatch.player.WatchHistoryManager
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.util.MimeTypes
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.CaptionStyleCompat
-import com.google.android.exoplayer2.ui.SubtitleView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import android.content.pm.ActivityInfo
-import android.content.res.Configuration
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 
 

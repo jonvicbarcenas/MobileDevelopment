@@ -64,6 +64,9 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.storage.ktx)
+    implementation("com.google.firebase:firebase-appcheck-playintegrity:17.1.1")
+    implementation("com.google.firebase:firebase-appcheck-ktx:17.1.1")
+    implementation("com.google.android.recaptcha:recaptcha:18.4.0")
 
     // 🔹 Third-party Libraries
     implementation(libs.circleimageview)
