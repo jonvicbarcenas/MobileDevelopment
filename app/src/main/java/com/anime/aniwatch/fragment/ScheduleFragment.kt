@@ -6,11 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ListView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.anime.aniwatch.AnimeAboutActivity
@@ -18,7 +14,6 @@ import com.anime.aniwatch.R
 import com.anime.aniwatch.adapter.DateAdapter
 import com.anime.aniwatch.adapter.ScheduleAdapter
 import com.anime.aniwatch.data.DateItem
-import com.anime.aniwatch.data.ScheduleResponse
 import com.anime.aniwatch.data.ScheduledAnime
 import org.json.JSONObject
 import java.io.BufferedReader

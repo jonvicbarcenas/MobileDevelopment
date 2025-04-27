@@ -20,10 +20,8 @@ import com.anime.aniwatch.activities.SecurityActivity
 import com.anime.aniwatch.activities.SplashActivity
 import com.anime.aniwatch.databinding.FragmentAccountBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.storage.StorageReference
 import com.anime.aniwatch.R
 import com.anime.aniwatch.activities.NotificationsActivity
 import com.anime.aniwatch.activities.SettingsActivity

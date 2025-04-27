@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,6 +33,7 @@ class HistoryFragment : Fragment() {
     private lateinit var historyAdapter: HistoryAdapter
     private lateinit var database: DatabaseReference
     private lateinit var auth: FirebaseAuth
+    private lateinit var emptyHistoryText: TextView
     private val watchHistoryList = mutableListOf<WatchHistory>()
 
     override fun onCreateView(
@@ -45,6 +47,8 @@ class HistoryFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         historyAdapter = HistoryAdapter(watchHistoryList)
         recyclerView.adapter = historyAdapter
+
+        emptyHistoryText = view.findViewById(R.id.emptyHistoryText)
 
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().getReference("WatchHistory")
@@ -83,6 +87,16 @@ class HistoryFragment : Fragment() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 watchHistoryList.clear()
                 val tempList = mutableListOf<WatchHistory>()
+
+                if (snapshot.childrenCount == 0L) {
+                    emptyHistoryText.visibility = View.VISIBLE
+                    recyclerView.visibility = View.GONE
+                    return
+                }
+
+                emptyHistoryText.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+
                 for (historySnapshot in snapshot.children) {
                     val watchHistory = historySnapshot.getValue(WatchHistory::class.java)
                     if (watchHistory != null) {
@@ -95,6 +109,12 @@ class HistoryFragment : Fragment() {
                                 tempList.sortByDescending { it.dateWatched }
                                 watchHistoryList.addAll(tempList)
                                 historyAdapter.notifyDataSetChanged()
+
+                                // Check if after filtering, the list is empty
+                                if (watchHistoryList.isEmpty()) {
+                                    emptyHistoryText.visibility = View.VISIBLE
+                                    recyclerView.visibility = View.GONE
+                                }
                             }
                         }
                     }

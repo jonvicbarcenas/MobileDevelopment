@@ -36,11 +36,11 @@ class DateAdapter(
                 notifyItemChanged(i)
             }
         }
-        
+
         // Select the new item
         dateItems[position] = dateItems[position].copy(isSelected = true)
         notifyItemChanged(position)
-        
+
         // Notify the listener
         onDateSelected(dateItems[position])
     }
@@ -64,10 +64,10 @@ class DateAdapter(
 
             // Update the background based on selection state
             if (dateItem.isSelected) {
-                dateTextView.setBackgroundResource(android.R.color.holo_blue_dark)
+                dateTextView.setBackgroundResource(R.drawable.date_circle_selected)
                 dateTextView.setTextColor(ContextCompat.getColor(context, android.R.color.white))
             } else {
-                dateTextView.setBackgroundResource(android.R.color.darker_gray)
+                dateTextView.setBackgroundResource(R.drawable.date_circle_unselected)
                 dateTextView.setTextColor(ContextCompat.getColor(context, android.R.color.white))
             }
         }

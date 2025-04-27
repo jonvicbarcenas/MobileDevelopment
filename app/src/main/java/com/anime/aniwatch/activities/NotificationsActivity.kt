@@ -10,7 +10,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.anime.aniwatch.R
-import com.google.firebase.messaging.FirebaseMessaging
 
 class NotificationsActivity : AppCompatActivity() {
 
@@ -59,28 +58,14 @@ class NotificationsActivity : AppCompatActivity() {
         }
     }
     private fun enableNotifications() {
-        FirebaseMessaging.getInstance().subscribeToTopic("notifications")
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    println("Successfully subscribed to notifications")
-                    Toast.makeText(this, "Successfully subscribed to notifications", Toast.LENGTH_SHORT).show()
-                } else {
-                    println("Failed to subscribe to notifications: ${task.exception?.message}")
-                    Toast.makeText(this, "Failed to subscribe to notifications", Toast.LENGTH_SHORT).show()
-                }
-            }
+        // Notifications are now controlled by schedule only
+        println("Notifications enabled for scheduled anime")
+        Toast.makeText(this, "Notifications enabled for scheduled anime", Toast.LENGTH_SHORT).show()
     }
 
     private fun disableNotifications() {
-        FirebaseMessaging.getInstance().unsubscribeFromTopic("notifications")
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    println("Successfully unsubscribed from notifications")
-                    Toast.makeText(this, "Successfully unsubscribed from notifications", Toast.LENGTH_SHORT).show()
-                } else {
-                    println("Failed to unsubscribe from notifications: ${task.exception?.message}")
-                    Toast.makeText(this, "Failed to unsubscribe from notifications", Toast.LENGTH_SHORT).show()
-                }
-            }
+        // Notifications are now controlled by schedule only
+        println("Notifications disabled for scheduled anime")
+        Toast.makeText(this, "Notifications disabled for scheduled anime", Toast.LENGTH_SHORT).show()
     }
 }

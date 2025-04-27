@@ -8,4 +8,15 @@
             android:padding="8dp"
             android:layout_height="wrap_content"
             />
+
+    <TextView
+            android:id="@+id/emptyHistoryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your history is empty"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            />
 </FrameLayout>

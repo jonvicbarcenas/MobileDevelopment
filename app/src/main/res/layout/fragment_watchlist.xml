@@ -19,7 +19,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="Your watchlist is empty"
-        android:textColor="#FFFFFF"
+        android:textStyle="bold"
         android:textSize="18sp"
         android:visibility="gone" />
 
