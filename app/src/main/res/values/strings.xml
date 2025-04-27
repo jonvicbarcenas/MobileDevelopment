@@ -1,26 +1,107 @@
 <resources>
     <string name="app_name">AniWatch</string>
 
-    <string-array name="movie_titles">
-        <item>One Piece</item>
-        <item>Naruto</item>
-        <item>Bleach</item>
-        <item>Fairy Tail</item>
-        <item>Black Clover</item>
-
-    </string-array>
-
-    <!-- Movie Descriptions -->
-    <string-array name="movie_descriptions">
-        <item>One Piece is a popular manga and anime series created by Eiichiro Oda. Set in a world where pirates roam the seas, the story follows Monkey D. Luffy and his crew, the Straw Hat Pirates, as they search for the ultimate treasure known as the "One Piece" and strive to become the next Pirate King..</item>
-        <item>Naruto is a Japanese anime series and manga series about a young ninja named Naruto Uzumaki. The story follows Naruto as he overcomes challenges to become the leader of his village, the Hokage. </item>
-        <item>Bleach is a Japanese manga series written and illustrated by Tite Kubo. It follows the adventures of a teenager Ichigo Kurosaki, who obtains the powers of a Soul Reaper—a death personification similar to a Grim Reaper—from another Soul Reaper, Rukia Kuchiki.</item>
-        <item>Fairy Tail is a Japanese manga series written and illustrated by Hiro Mashima. The series follows the adventures of the Celestial Spirit Mage Lucy Heartfilia after she joins the Fairy Tail Guild and teams up with Natsu Dragneel. </item>
-        <item>Black Clover is set in a world where people are born with the ability to use magic, the story follows Asta, a young boy without any magic power who is given a rare grimoire that grants him anti-magic abilities. With his fellow mages from the Black Bulls, Asta plans to become the next Wizard King.</item>
-    </string-array>
     <string name="title_activity_player">PlayerActivity</string>
     <string name="episode_title">Episode Title</string>
     <string name="episode_number">Episode Number</string>
 
 
+        <!-- Vision description -->
+        <string name="vision">At AniWatch, we aim to provide anime fans with a seamless streaming experience, offering a vast library of high-quality shows. Our goal is to create a user-friendly platform where fans can easily discover, watch, and enjoy anime, anytime and anywhere. We’re dedicated to making anime more accessible and enjoyable for everyone.</string>
+
+        <string name="person1_name">Leana Mariflor A. Belaguas</string>
+        <string name="person1_bio">UI / UX</string>
+        <string name="person1_experience">Java, Kotlin, Android Development, UI/UX</string>
+
+        <string name="person2_name">Jon Vic T. Barcenas</string>
+        <string name="person2_bio">Back end</string>
+        <string name="person2_experience">React, JavaScript, HTML/CSS, Frontend Development</string>
+
+
+        <!-- Privacy Policy Strings -->
+
+        <string name="policy_title1">1. Information Collection</string>
+        <string name="policy_section_1_desc">We collect personal information such as your name, email address, and payment details when you create an account or make purchases. We also gather usage data, including your IP address and device information, to enhance your experience.</string>
+
+        <string name="policy_title2">2. Use of Information</string>
+        <string name="policy_section_2_desc">Your information is used to provide and improve our services, process transactions, and communicate with you about updates and promotions.</string>
+
+        <string name="policy_title3">3. Data Sharing</string>
+        <string name="policy_section_3_desc">We do not sell your personal information. We may share your data with trusted third-party service providers to assist with operations, but only as necessary and in compliance with applicable laws.</string>
+
+        <string name="policy_title4">4. User Rights</string>
+        <string name="policy_section_4_desc">You have the right to access, correct, or delete your personal information. You can also opt-out of marketing communications at any time.</string>
+
+        <string name="policy_title5">5. Security</string>
+        <string name="policy_section_5_desc">We implement reasonable security measures to protect your data from unauthorized access and breaches.</string>
+
+        <string name="policy_title6">6. Changes to Policy</string>
+        <string name="policy_section_6_desc">We may update our privacy policy periodically. Any changes will be communicated through the app.</string>
+
+
+        <!-- Terms of Service Strings -->
+
+        <string name="terms_title1">1. Acceptance of Terms</string>
+        <string name="terms_section_1_desc">By using the Aniwatch streaming app, you agree to comply with and be bound by these Terms of Service. If you do not agree with any part of these terms, you may not use the app.</string>
+
+        <string name="terms_title2">2. User Eligibility</string>
+        <string name="terms_section_2_desc">You must be at least 13 years old to use Aniwatch. By using the app, you confirm that you meet this age requirement or have parental consent.</string>
+
+        <string name="terms_title3">3. User Responsibilities</string>
+        <string name="terms_section_3_desc">You agree to use the app only for lawful purposes. You are responsible for maintaining the confidentiality of your account and for all activities under your account.</string>
+
+        <string name="terms_title4">4. Content Ownership</string>
+        <string name="terms_section_4_desc">All content on Aniwatch, including videos, graphics, logos, and software, is the property of Aniwatch or its licensors. You may not reproduce, distribute, or modify any content without permission.</string>
+
+        <string name="terms_title5">5. Service Availability</string>
+        <string name="terms_section_5_desc">We strive to keep the service running smoothly but cannot guarantee uninterrupted access. We may suspend or terminate the service for maintenance, updates, or other reasons without prior notice.</string>
+
+        <string name="terms_title6">6. Termination</string>
+        <string name="terms_section_6_desc">Aniwatch reserves the right to terminate or suspend your account without notice if you violate these Terms of Service or engage in any harmful activity.</string>
+
+        <string name="terms_title7">7. Changes to Terms</string>
+        <string name="terms_section_7_desc">We may update these Terms of Service at any time. Continued use of Aniwatch after changes are posted indicates your acceptance of the revised terms.</string>
+
+        <string name="terms_title8">8. Contact Us</string>
+        <string name="terms_section_8_desc">If you have questions or concerns about these Terms of Service, please contact our support team through the app or via email.</string>
+
+
+
+    <string name="third_party_title1">1. Android Studio</string>
+    <string name="third_party_desc1">Aniwatch was built using Android Studio, an official IDE provided by Google for Android development. Learn more at https://developer.android.com/studio</string>
+
+    <string name="third_party_title2">2. Firebase</string>
+    <string name="third_party_desc2">This app uses Firebase services such as Authentication and Firestore, provided by Google. Firebase helps us deliver a secure and smooth user experience. Visit https://firebase.google.com for details.</string>
+
+    <string name="third_party_title3">3. Android SDK</string>
+    <string name="third_party_desc3">Aniwatch relies on the Android Software Development Kit (SDK) to function across Android devices. The SDK is a fundamental part of Android app development and is maintained by Google.</string>
+
+    <string name="third_party_title4">4. GitHub Libraries</string>
+    <string name="third_party_desc4">We use open-source libraries from GitHub to enhance functionality and performance. All libraries are credited to their respective creators and comply with their licenses.</string>
+
+    <string name="third_party_title5">5. Image &amp; Icon Assets</string>
+    <string name="third_party_desc5">Some icons and images used in Aniwatch may come from third-party open-source repositories or royalty-free platforms. Credits are given where applicable in the app or accompanying documentation.</string>
+
+    <string name="third_party_title6">6. Licenses</string>
+    <string name="third_party_desc6">All third-party tools, SDKs, and libraries used in this app are licensed under their respective terms. We respect and comply with these licenses as part of our commitment to open development.</string>
+    <!-- Retrofit -->
+    <string name="third_party_title7">7. Retrofit</string>
+    <string name="third_party_desc7">Retrofit is a type-safe HTTP client developed by Square. It simplifies network operations and API integrations. Learn more at https://square.github.io/retrofit/</string>
+
+    <!-- Glide -->
+    <string name="third_party_title8">8. Glide</string>
+    <string name="third_party_desc8">Glide is an image loading and caching library for Android focused on smooth scrolling. It is developed by Bumptech and is widely used for image handling. https://bumptech.github.io/glide/</string>
+
+
+    <!-- Material Components -->
+    <string name="third_party_title9">10. Material Components for Android</string>
+    <string name="third_party_desc9">Aniwatch uses Google\'s Material Components to ensure UI consistency and modern design standards. Learn more at https://m3.material.io/</string>
+
+    <!-- Google Play Services -->
+    <string name="third_party_title10">11. Google Play Services</string>
+    <string name="third_party_desc10">This app integrates with Google Play Services to support functionality like authentication, updates, and analytics. https://developers.google.com/android/guides/overview</string>
+
+
 </resources>
+
+

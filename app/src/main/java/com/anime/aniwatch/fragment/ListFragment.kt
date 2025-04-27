@@ -32,8 +32,10 @@ class ListFragment : Fragment() {
             title = "My List"
         }
 
+
         viewPager = view.findViewById(R.id.viewPager)
         tabLayout = view.findViewById(R.id.tabLayout)
+
 
         val fragmentAdapter = FragmentAdapter(childFragmentManager)
         fragmentAdapter.addFragment(WatchlistFragment(), "Watchlist")
@@ -51,5 +53,7 @@ class ListFragment : Fragment() {
         viewPager?.adapter = null
         viewPager = null
         tabLayout = null
+        val activity = activity as? AppCompatActivity
+
     }
 }

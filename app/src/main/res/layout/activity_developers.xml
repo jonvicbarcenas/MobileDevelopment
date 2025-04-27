@@ -1,225 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#121212"
-        tools:context=".activities.DevelopersActivity">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <!-- Vision Section -->
+    <LinearLayout
+            android:id="@+id/visionLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:elevation="0dp">
+            android:gravity="center"
+            android:orientation="horizontal">
 
-        <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="#121212"
-                app:title="Developers"
-                app:titleTextAppearance="@style/TextAppearance.AppCompat.Medium"
-                app:titleTextColor="#FFFFFF" />
-    </com.google.android.material.appbar.AppBarLayout>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OUR "
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-    <androidx.core.widget.NestedScrollView
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VISION"
+                android:textColor="#A59FED"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+            android:id="@+id/vision"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="@string/vision"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="8dp"
+            android:paddingBottom="50dp"
+            android:justificationMode="inter_word" />
+
+    <!-- About Developers Section -->
+    <LinearLayout
+            android:layout_marginBottom="20dp"
+            android:id="@+id/aboutDevelopersLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ABOUT THE "
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DEVELOPERS"
+                android:textColor="#A59FED"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- CardView for Developer Information -->
+    <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#1E1E1E"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
+        <!-- Inner LinearLayout for Developer Info -->
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingHorizontal="24dp"
-                android:paddingVertical="32dp">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
 
-            <!-- Vision Section -->
+            <!-- CircleImageView for displaying person image -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/account"
+                    app:civ_border_color="#A59FED"
+                    app:civ_border_width="2dp" />
+
+            <!-- Name and Bio Text Views -->
             <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-
-                <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:orientation="horizontal">
-
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="OUR "
-                            android:textColor="#FFFFFF"
-                            android:textSize="20sp"
-                            android:fontFamily="sans-serif-medium" />
-
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="VISION"
-                            android:textColor="#A59FED"
-                            android:textSize="20sp"
-                            android:fontFamily="sans-serif-medium" />
-                </LinearLayout>
-
-                <View
-                        android:layout_width="40dp"
-                        android:layout_height="3dp"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="24dp"
-                        android:background="#A59FED" />
 
                 <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="At AniWatch, we aim to provide anime fans with a seamless streaming experience, offering a vast library of high-quality shows. Our goal is to create a user-friendly platform where fans can easily discover, watch, and enjoy anime, anytime and anywhere. We're dedicated to making anime more accessible and enjoyable for everyone."
-                        android:textColor="#E0E0E0"
-                        android:textSize="15sp"
-                        android:lineSpacingExtra="4dp"
-                        android:justificationMode="inter_word"
-                        android:fontFamily="sans-serif-light" />
-            </LinearLayout>
-
-            <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp" />
-
-            <!-- Developers Section -->
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                <LinearLayout
+                        android:id="@+id/personName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:orientation="horizontal">
+                        android:text="Person Name"
+                        android:textSize="18sp"
+                        android:textColor="#A59FED"
+                        android:fontFamily="sans-serif-medium" />
 
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="ABOUT THE "
-                            android:textColor="#FFFFFF"
-                            android:textSize="20sp"
-                            android:fontFamily="sans-serif-medium" />
-
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="DEVELOPERS"
-                            android:textColor="#A59FED"
-                            android:textSize="20sp"
-                            android:fontFamily="sans-serif-medium" />
-                </LinearLayout>
-
-                <View
-                        android:layout_width="40dp"
-                        android:layout_height="3dp"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="32dp"
-                        android:background="#A59FED" />
-
-                <!-- Developer Cards -->
-                <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
+                <TextView
+                        android:id="@+id/personBio"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        app:cardBackgroundColor="#1E1E1E"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp">
-
-                    <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:padding="16dp">
-
-                        <de.hdodenhof.circleimageview.CircleImageView
-                                android:layout_width="80dp"
-                                android:layout_height="80dp"
-                                android:src="@drawable/profile2"
-                                app:civ_border_color="#A59FED"
-                                app:civ_border_width="2dp" />
-
-                        <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:layout_marginStart="16dp"
-                                android:orientation="vertical">
-
-                            <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Jon Vic Barcenas"
-                                    android:textColor="#A59FED"
-                                    android:textSize="18sp"
-                                    android:fontFamily="sans-serif-medium" />
-
-                            <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:text="Back end Developer"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="14sp"
-                                    android:fontFamily="sans-serif-light" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:cardBackgroundColor="#1E1E1E"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp">
-
-                    <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:padding="16dp">
-
-                        <de.hdodenhof.circleimageview.CircleImageView
-                                android:layout_width="80dp"
-                                android:layout_height="80dp"
-                                android:src="@drawable/profile1"
-                                app:civ_border_color="#A59FED"
-                                app:civ_border_width="2dp" />
-
-                        <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:layout_marginStart="16dp"
-                                android:orientation="vertical">
-
-                            <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Leana Mariflor Belaguas"
-                                    android:textColor="#A59FED"
-                                    android:textSize="18sp"
-                                    android:fontFamily="sans-serif-medium" />
-
-                            <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:text="UI/UX Developer"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="14sp"
-                                    android:fontFamily="sans-serif-light" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                        android:text="Person Bio"
+                        android:textSize="14sp"
+                        android:textColor="#FFFFFF"
+                        android:fontFamily="sans-serif-light"
+                        android:layout_marginTop="4dp" />
             </LinearLayout>
+
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

@@ -130,7 +130,7 @@ class ProfileEditActivity : AppCompatActivity() {
 
     private fun loadProfileImage() {
         val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
-        val savedImageResId = sharedPreferences.getInt("profileImageRes", R.drawable.zoro)  // Default image if not set
+        val savedImageResId = sharedPreferences.getInt("profileImageRes", R.drawable.account)  // Default image if not set
         binding.profileImage.setImageResource(savedImageResId)
     }
 

@@ -5,13 +5,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
     <!-- Add permissions for alarms and notifications -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.SET_ALARM" />
-
+   
     <application
             android:allowBackup="true"
             android:dataExtractionRules="@xml/data_extraction_rules"
@@ -21,16 +22,22 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.App.AniWatch"
             tools:targetApi="31">
+
+
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_icon"
+                android:resource="@drawable/notif" />
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_color"
+                android:resource="@color/blue" />
+
         <activity
                 android:name=".activities.PlayerActivity"
                 android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
                 android:exported="false"
                 android:label="@string/title_activity_player"
                 android:theme="@style/Theme.App.AniWatch" />
-        <activity
-                android:name=".activities.MovieDetailActivity"
-                android:exported="true"
-                android:theme="@style/Theme.App.AniWatch" />
+
         <activity
                 android:name=".activities.ChangePasswordActivity"
                 android:exported="true"
@@ -56,10 +63,7 @@
                 android:name=".activities.SignInActivity"
                 android:exported="true"
                 android:theme="@style/Theme.App.AniWatch" />
-        <activity
-                android:name=".activities.DevelopersActivity"
-                android:exported="true"
-                android:theme="@style/Theme.App.AniWatch" />
+
         <activity
                 android:name=".AnimeAboutActivity"
                 android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
@@ -85,6 +89,7 @@
                 android:exported="true"
                 android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
                 android:theme="@style/Theme.App.AniWatch" />
+
         <!-- Register the AlarmReceiver -->
         <receiver
                 android:name=".receiver.AlarmReceiver"
@@ -94,6 +99,18 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+
+        <service
+                android:name=".viewmodel.FirebaseMessageReceiver"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+
+
     </application>
 
 </manifest>

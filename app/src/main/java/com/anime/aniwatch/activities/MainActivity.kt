@@ -1,11 +1,15 @@
 package com.anime.aniwatch.activities
 
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.anime.aniwatch.*
 import com.anime.aniwatch.databinding.ActivityMainBinding
@@ -13,6 +17,9 @@ import com.anime.aniwatch.fragment.AccountFragment
 import com.anime.aniwatch.fragment.HomeFragment
 import com.anime.aniwatch.fragment.ListFragment
 import com.google.firebase.FirebaseApp
+import com.google.firebase.messaging.FirebaseMessaging
+import android.Manifest
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,6 +54,30 @@ class MainActivity : AppCompatActivity() {
             }
             fragment?.let { replaceFragment(it) }
             fragment != null
+        }
+
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                    return@addOnCompleteListener
+                }
+
+                val token = task.result
+                Log.d("FCM", "FCM Token: $token")
+
+            }
+
+        // Request notification permission if needed (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1
+                )
+            }
         }
     }
 
@@ -95,7 +126,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Reset the flag after a delay to allow the transaction to complete
         binding.root.postDelayed({
             isFragmentTransactionInProgress = false
         }, fragmentTransactionDebounceTime)
@@ -103,6 +133,7 @@ class MainActivity : AppCompatActivity() {
     private fun enableBackButton() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
+
 
     private fun disableBackButton() {
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
@@ -121,7 +152,6 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         val currentFragment = supportFragmentManager.findFragmentById(R.id.frame_layout)
         if (currentFragment is HomeFragment) {
-            // Update BottomNavigationView to reflect HomeFragment
             binding.bottomNavigationView.selectedItemId = R.id.home
             finish()
         } else {
@@ -137,10 +167,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun hideSearchButton() {
-        val searchButton = binding.toolbar.menu.findItem(R.id.action_search)
-        searchButton?.isVisible = false
-    }
 
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
         return when (item.itemId) {

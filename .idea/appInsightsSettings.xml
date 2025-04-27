@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.anime.aniwatch" />
+                  <option name="mobileSdkAppId" value="1:875738356946:android:afbd39391cc7d22c25a10b" />
+                  <option name="projectId" value="aniwatch-csit284g6" />
+                  <option name="projectNumber" value="875738356946" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

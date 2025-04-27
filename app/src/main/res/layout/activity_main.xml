@@ -21,13 +21,6 @@
                 android:background="@color/gray"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            <!-- App logo -->
-            <ImageView
-                    android:id="@+id/logo"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_gravity="start"
-                    android:src="@drawable/logo_no_bg" />
 
             <!-- Search button -->
             <androidx.appcompat.widget.AppCompatImageButton

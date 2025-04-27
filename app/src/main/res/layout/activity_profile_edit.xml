@@ -65,7 +65,7 @@
                     android:textColorHint="@color/white"
                     android:textSize="18sp" />
 
-                <EditText
+                <TextView
                     android:id="@+id/emailadd"
                     android:layout_width="300dp"
                     android:layout_height="50dp"

@@ -4,31 +4,32 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/black"
         tools:context=".fragment.WeekFragment">
 
-    <LinearLayout
+    <!-- Shimmer loading effect at the top -->
+    <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmerLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginTop="8dp"
+            app:shimmer_auto_start="true"
+            app:shimmer_duration="1500"
+            android:paddingHorizontal="16dp">
 
-        <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/shimmerLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:shimmer_auto_start="true"
-                app:shimmer_duration="1500">
+        <include layout="@layout/shimmer_item" />
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
-            <include layout="@layout/shimmer_item" />
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-    </LinearLayout>
-
+    <!-- Main content list -->
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
             android:clipToPadding="false"
             android:scrollbars="vertical"
             android:layout_gravity="center" />
+
 </FrameLayout>
