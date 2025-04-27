@@ -17,7 +17,6 @@ import com.anime.aniwatch.fragment.AccountFragment
 import com.anime.aniwatch.fragment.HomeFragment
 import com.anime.aniwatch.fragment.ListFragment
 import com.google.firebase.FirebaseApp
-import com.google.firebase.messaging.FirebaseMessaging
 import android.Manifest
 
 
@@ -55,18 +54,6 @@ class MainActivity : AppCompatActivity() {
             fragment?.let { replaceFragment(it) }
             fragment != null
         }
-
-        FirebaseMessaging.getInstance().token
-            .addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w("FCM", "Fetching FCM registration token failed", task.exception)
-                    return@addOnCompleteListener
-                }
-
-                val token = task.result
-                Log.d("FCM", "FCM Token: $token")
-
-            }
 
         // Request notification permission if needed (Android 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
