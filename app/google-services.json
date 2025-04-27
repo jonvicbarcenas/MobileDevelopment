@@ -1,14 +1,14 @@
 {
   "project_info": {
-    "project_number": "875738356946",
-    "firebase_url": "https://aniwatch-csit284g6-default-rtdb.firebaseio.com",
-    "project_id": "aniwatch-csit284g6",
-    "storage_bucket": "aniwatch-csit284g6.firebasestorage.app"
+    "project_number": "685877748778",
+    "firebase_url": "https://aniwatch-7fc09-default-rtdb.firebaseio.com",
+    "project_id": "aniwatch-7fc09",
+    "storage_bucket": "aniwatch-7fc09.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:875738356946:android:afbd39391cc7d22c25a10b",
+        "mobilesdk_app_id": "1:685877748778:android:848bfab3b80e6b000fcf53",
         "android_client_info": {
           "package_name": "com.anime.aniwatch"
         }
@@ -16,26 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCfDBxoHo3jRihAy0fhMVqExZQBrAfs0N8"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:875738356946:android:253bb7eb6293428e25a10b",
-        "android_client_info": {
-          "package_name": "com.example.aniwatch"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCfDBxoHo3jRihAy0fhMVqExZQBrAfs0N8"
+          "current_key": "AIzaSyDr0BfisQSEvLejx2qWvMzg0xi1J0IDjMc"
         }
       ],
       "services": {

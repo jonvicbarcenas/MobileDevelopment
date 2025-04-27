@@ -21,6 +21,14 @@
                 android:background="@color/gray"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
+            <!-- Logo -->
+            <ImageView
+                    android:id="@+id/toolbar_logo"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="start"
+                    android:contentDescription="App Logo"
+                    android:src="@drawable/logo_no_bg"/>
 
             <!-- Search button -->
             <androidx.appcompat.widget.AppCompatImageButton
@@ -30,7 +38,7 @@
                     android:layout_gravity="end"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Search"
-                    android:src="@drawable/search" />
+                    android:src="@drawable/search"/>
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
