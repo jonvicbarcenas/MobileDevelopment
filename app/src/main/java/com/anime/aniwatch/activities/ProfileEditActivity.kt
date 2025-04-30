@@ -50,10 +50,33 @@ class ProfileEditActivity : AppCompatActivity() {
                 if (snapshot.exists()) {
                     val user = snapshot.child("username").getValue(String::class.java)
                     binding.username.setText(user ?: "")
+
+                    // Load profile image from database if available
+                    if (snapshot.hasChild("profileImageRes")) {
+                        val profileImageRes = snapshot.child("profileImageRes").getValue(Int::class.java)
+                        if (profileImageRes != null) {
+                            binding.profileImage.setImageResource(profileImageRes)
+                            selectedImageResId = profileImageRes
+                        } else {
+                            // If not in database, load from SharedPreferences
+                            loadProfileImage()
+                        }
+                    } else {
+                        // If not in database, load from SharedPreferences
+                        loadProfileImage()
+                    }
+                } else {
+                    // If user data doesn't exist, still load profile image from SharedPreferences
+                    loadProfileImage()
                 }
             }.addOnFailureListener {
                 Toast.makeText(this, "Failed to load user data", Toast.LENGTH_SHORT).show()
+                // Even if database fetch fails, try to load from SharedPreferences
+                loadProfileImage()
             }
+        } else {
+            // If no user ID, still try to load from SharedPreferences
+            loadProfileImage()
         }
 
         // Handle profile image click - show predefined images to select
@@ -113,6 +136,8 @@ class ProfileEditActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
         val savedImageResId = sharedPreferences.getInt("profileImageRes", R.drawable.account)
         binding.profileImage.setImageResource(savedImageResId)
+        // Also update the selectedImageResId variable to ensure it's saved if user updates profile
+        selectedImageResId = savedImageResId
     }
 
     private fun updateProfile(uid: String?) {

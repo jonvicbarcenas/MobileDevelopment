@@ -61,6 +61,7 @@
                 android:exported="true" />
         <activity
                 android:name=".activities.SignInActivity"
+                android:launchMode="singleTask"
                 android:exported="true"
                 android:theme="@style/Theme.App.AniWatch" />
 
