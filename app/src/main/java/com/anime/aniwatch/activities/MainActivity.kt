@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Show disclaimer dialog
         showDisclaimerDialog()
 
         setSupportActionBar(binding.toolbar)
@@ -62,7 +61,6 @@ class MainActivity : AppCompatActivity() {
             fragment != null
         }
 
-        // Request notification permission if needed (Android 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(
                     this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -76,7 +74,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun replaceFragment(fragment: Fragment) {
-        // If a transaction is already in progress, ignore this request
         if (isFragmentTransactionInProgress) {
             return
         }
@@ -84,12 +81,10 @@ class MainActivity : AppCompatActivity() {
         val fragmentManager = supportFragmentManager
         val currentFragment = fragmentManager.findFragmentById(R.id.frame_layout)
 
-        // Avoid replacing with the same fragment
         if (currentFragment != null && currentFragment::class == fragment::class) {
             return
         }
 
-        // Set the flag to indicate a transaction is in progress
         isFragmentTransactionInProgress = true
 
         val fragmentTransaction = fragmentManager.beginTransaction()

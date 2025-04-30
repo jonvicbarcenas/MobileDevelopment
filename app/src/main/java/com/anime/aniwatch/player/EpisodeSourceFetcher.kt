@@ -27,7 +27,6 @@ class EpisodeSourceFetcher(private val context: Context) {
     private val apiService = retrofit.create(ApiService::class.java)
 
     fun fetchEpisodeSources(episodeId: String, callback: EpisodeSourceCallback) {
-        // First attempt: Fetch from the default server
         apiService.getEpisodeSources(episodeId).enqueue(object : Callback<EpisodeSourceResponse> {
             override fun onResponse(call: Call<EpisodeSourceResponse>, response: Response<EpisodeSourceResponse>) {
                 if (response.isSuccessful && response.body()?.success == true) {

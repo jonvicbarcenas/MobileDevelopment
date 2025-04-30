@@ -32,10 +32,8 @@ class AccountFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var databaseReference: DatabaseReference
 
-    // Store user data at a higher scope for access in callbacks
     private lateinit var userData: UserProfileData
 
-    // Constants for SharedPreferences
     private val USER_PREFS = "userPrefs"
     private val USERNAME_KEY = "username"
     private val EMAIL_KEY = "email"
@@ -289,7 +287,6 @@ class AccountFragment : Fragment() {
         return UserProfileData(username, email, profileImageResId)
     }
 
-    // Data class to hold user profile information
     data class UserProfileData(
         val username: String?,
         val email: String?,

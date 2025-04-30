@@ -21,7 +21,6 @@ object WatchlistUtil {
         val userId = auth.currentUser?.uid ?: return
         val watchlistRef: DatabaseReference = database.getReference("Watchlist").child(userId)
 
-        // Set current date if not provided
         if (watchlistEpisode.dateAdded.isEmpty()) {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             watchlistEpisode.dateAdded = dateFormat.format(Date())

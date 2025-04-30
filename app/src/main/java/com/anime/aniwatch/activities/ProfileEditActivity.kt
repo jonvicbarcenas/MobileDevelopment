@@ -51,37 +51,29 @@ class ProfileEditActivity : AppCompatActivity() {
                     val user = snapshot.child("username").getValue(String::class.java)
                     binding.username.setText(user ?: "")
 
-                    // Load profile image from database if available
                     if (snapshot.hasChild("profileImageRes")) {
                         val profileImageRes = snapshot.child("profileImageRes").getValue(Int::class.java)
                         if (profileImageRes != null) {
                             binding.profileImage.setImageResource(profileImageRes)
                             selectedImageResId = profileImageRes
                         } else {
-                            // If not in database, load from SharedPreferences
                             loadProfileImage()
                         }
                     } else {
-                        // If not in database, load from SharedPreferences
                         loadProfileImage()
                     }
                 } else {
-                    // If user data doesn't exist, still load profile image from SharedPreferences
                     loadProfileImage()
                 }
             }.addOnFailureListener {
                 Toast.makeText(this, "Failed to load user data", Toast.LENGTH_SHORT).show()
-                // Even if database fetch fails, try to load from SharedPreferences
                 loadProfileImage()
             }
         } else {
-            // If no user ID, still try to load from SharedPreferences
             loadProfileImage()
         }
 
-        // Handle profile image click - show predefined images to select
         binding.profileImage.setOnClickListener {
-            // Show predefined profile images from drawable
             showImagePickerDialog()
         }
 
@@ -90,20 +82,15 @@ class ProfileEditActivity : AppCompatActivity() {
         }
     }
 
-    // Show a dialog to pick a profile image
     private fun showImagePickerDialog() {
-        // Inflate the dialog layout
         val dialogView = layoutInflater.inflate(R.layout.profile_images, null)
         val gridView = dialogView.findViewById<GridView>(R.id.gridViewImages)
 
-        // Use MovieData.avatars for image IDs
         val imageIds = MovieData.avatars.toTypedArray() // Convert to array
 
-        // Initialize the adapter and set it to the GridView
         val imageAdapter = ProfileImageAdapter(this, imageIds)
         gridView.adapter = imageAdapter
 
-        // Create the dialog
         val dialog = android.app.AlertDialog.Builder(this)
             .setTitle("Select Profile Image")
             .setView(dialogView)
@@ -136,7 +123,6 @@ class ProfileEditActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
         val savedImageResId = sharedPreferences.getInt("profileImageRes", R.drawable.account)
         binding.profileImage.setImageResource(savedImageResId)
-        // Also update the selectedImageResId variable to ensure it's saved if user updates profile
         selectedImageResId = savedImageResId
     }
 

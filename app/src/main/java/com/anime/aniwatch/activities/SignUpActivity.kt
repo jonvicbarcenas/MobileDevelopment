@@ -24,7 +24,6 @@ class SignUpActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
 
-        // Signup button click listener
         binding.signupButton.setOnClickListener {
             val email = binding.signupEmail.text.toString()
             val password = binding.signupPassword.text.toString()
@@ -65,7 +64,6 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    // Validate email format using regex
     private fun isValidEmail(email: String): Boolean {
         val emailPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$"

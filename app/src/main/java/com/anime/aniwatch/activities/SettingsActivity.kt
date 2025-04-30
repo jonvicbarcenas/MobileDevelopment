@@ -18,7 +18,6 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        // Set up the toolbar with a back button
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -27,15 +26,12 @@ class SettingsActivity : AppCompatActivity() {
             onBackPressed()
         }
 
-        // Initialize the ExpandableListView
         expandableListView = findViewById(R.id.expandableListView)
         expandableListView.divider = resources.getDrawable(android.R.color.transparent, null)
         expandableListView.dividerHeight = 0
-        // Generate the data for the expandable list
         listData = generateData()
 
-        // Set up the adapter
-        adapter = ExpandableListAdapter(this, listData)  // Pass context as 'this'
+        adapter = ExpandableListAdapter(this, listData)
         expandableListView.setAdapter(adapter)
 
 
@@ -43,8 +39,7 @@ class SettingsActivity : AppCompatActivity() {
             val group = adapter.getGroup(groupPosition).toString()
             val child = adapter.getChild(groupPosition, childPosition) as List<String>
 
-            // Example: Log click or show a Toast
-            Toast.makeText(this, "Clicked: ${child[0]}", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "Clicked: ${child[0]}", Toast.LENGTH_SHORT).show()
 
             true // important: return true to indicate the click was handled
         }
@@ -97,7 +92,6 @@ class SettingsActivity : AppCompatActivity() {
 
             )
 
-        // Adding groups to the data
         data["Developers"] = developers
         data["Privacy Policy"] = privacy
         data["Terms of Service"] = terms

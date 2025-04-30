@@ -22,7 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var listOfMovies: MutableList<Anime> // Changed from Movie to Anime
+    private lateinit var listOfMovies: MutableList<Anime>
     private lateinit var movieAdapter: SearchAdapter
     private lateinit var binding: SearchBinding
 

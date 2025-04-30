@@ -27,19 +27,15 @@ class NotificationsActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Handle toolbar navigation
         toolbar.setNavigationOnClickListener {
             onBackPressed()
         }
 
-        // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("app_preferences", MODE_PRIVATE)
 
-        // Set the initial state of the switch
         val notificationsEnabled = sharedPreferences.getBoolean("notifications_enabled", true)
         notificationSwitch.isChecked = notificationsEnabled
 
-        // Set up the Switch to toggle notifications
         notificationSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
             try {
                 if (isChecked) {
@@ -49,7 +45,6 @@ class NotificationsActivity : AppCompatActivity() {
                     disableNotifications() // Disable notifications
                     Toast.makeText(this, "Notifications Disabled", Toast.LENGTH_SHORT).show()
                 }
-                // Save the user's preference
                 sharedPreferences.edit().putBoolean("notifications_enabled", isChecked).apply()
             } catch (e: Exception) {
                 e.printStackTrace() // Log the exception to the console
@@ -58,13 +53,11 @@ class NotificationsActivity : AppCompatActivity() {
         }
     }
     private fun enableNotifications() {
-        // Notifications are now controlled by schedule only
         println("Notifications enabled for scheduled anime")
         Toast.makeText(this, "Notifications enabled for scheduled anime", Toast.LENGTH_SHORT).show()
     }
 
     private fun disableNotifications() {
-        // Notifications are now controlled by schedule only
         println("Notifications disabled for scheduled anime")
         Toast.makeText(this, "Notifications disabled for scheduled anime", Toast.LENGTH_SHORT).show()
     }

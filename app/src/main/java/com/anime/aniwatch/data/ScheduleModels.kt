@@ -1,10 +1,5 @@
 package com.anime.aniwatch.data
 
-data class ScheduleResponse(
-    val success: Boolean,
-    val data: ScheduleData
-)
-
 data class ScheduleData(
     val scheduledAnimes: List<ScheduledAnime>
 )

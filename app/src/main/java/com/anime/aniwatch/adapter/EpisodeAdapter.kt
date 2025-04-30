@@ -92,7 +92,6 @@ class EpisodeAdapter(
                 }
             }
             is LoadingViewHolder -> {
-                // Start shimmer animation
                 holder.shimmerFrameLayout.startShimmer()
             }
         }
@@ -129,7 +128,6 @@ class EpisodeAdapter(
 
     override fun getItemCount(): Int {
         return if (isLoading) {
-            // Return a fixed number of skeleton items when loading
             10
         } else {
             episodes.size
@@ -142,10 +140,7 @@ class EpisodeAdapter(
         notifyDataSetChanged()
     }
 
-    /**
-     * Set the loading state of the adapter
-     * @param loading true to show skeleton loading, false to show content
-     */
+
     fun setLoading(loading: Boolean) {
         if (isLoading != loading) {
             isLoading = loading

@@ -23,20 +23,11 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var playerView: StyledPlayerView
 
     
-    // Helper classes
     private lateinit var playerManager: PlayerManager
     private lateinit var fullscreenManager: FullscreenManager
     private lateinit var episodeSourceFetcher: EpisodeSourceFetcher
     private lateinit var watchHistoryManager: WatchHistoryManager
     private lateinit var episodeDetailsManager: EpisodeDetailsManager
-
-    private var playbackPosition: Long = 0
-    private var playWhenReady: Boolean = true
-    private lateinit var backButton: ImageView
-
-
-    private var isFullscreen = false
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +41,6 @@ class PlayerActivity : AppCompatActivity() {
         playerView = findViewById(R.id.playerView)
 
         
-        // Initialize helper classes
         playerManager = PlayerManager(this, playerView)
         fullscreenManager = FullscreenManager(this, playerView)
         episodeSourceFetcher = EpisodeSourceFetcher(this)
@@ -62,7 +52,6 @@ class PlayerActivity : AppCompatActivity() {
 
 
 
-        // Set up fullscreen button click listener
         playerView.setControllerOnFullScreenModeChangedListener { isFullScreen ->
             if (isFullScreen) {
                 fullscreenManager.enterFullscreen()
@@ -71,7 +60,6 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
-        // Get episode and anime IDs from intent
         val episodeId = intent.getStringExtra("EPISODE_ID")
         val animeId = intent.getStringExtra("ANIME_ID")
         
@@ -81,13 +69,10 @@ class PlayerActivity : AppCompatActivity() {
             return
         }
 
-        // Fetch episode sources
         fetchEpisodeSources(episodeId)
         
-        // Load episode fragment
         loadEpisodeFragment(animeId.toString())
         
-        // Fetch episode details
         if (animeId != null && episodeId != null) {
             episodeDetailsManager.fetchEpisodeDetails(
                 animeId, 
@@ -104,11 +89,9 @@ class PlayerActivity : AppCompatActivity() {
     private fun fetchEpisodeSources(episodeId: String) {
         episodeSourceFetcher.fetchEpisodeSources(episodeId, object : EpisodeSourceFetcher.EpisodeSourceCallback {
             override fun onSourceFetched(hlsUrl: String, tracks: List<Track>, referer: String) {
-                // Get watched time from history
                 val animeId = intent.getStringExtra("ANIME_ID") ?: return
                 
                 watchHistoryManager.getWatchedTime(episodeId, animeId) { savedWatchedTime ->
-                    // Prepare player with the fetched sources
                     playerManager.preparePlayer(hlsUrl, tracks, referer, savedWatchedTime)
                 }
             }
@@ -131,13 +114,10 @@ class PlayerActivity : AppCompatActivity() {
             val newEpisodeId = it.getStringExtra("EPISODE_ID") ?: return
             val newAnimeId = it.getStringExtra("ANIME_ID") ?: return
 
-            // Clear the current player state
             playerManager.stopPlayer()
 
-            // Update the intent data
             this.intent = intent
 
-            // Fetch and prepare the new episode
             fetchEpisodeSources(newEpisodeId)
             loadEpisodeFragment(newAnimeId)
             episodeDetailsManager.fetchEpisodeDetails(
@@ -171,7 +151,6 @@ class PlayerActivity : AppCompatActivity() {
             playerManager.getDuration()
         )
         
-        // Release player
         playerManager.releasePlayer()
     }
 

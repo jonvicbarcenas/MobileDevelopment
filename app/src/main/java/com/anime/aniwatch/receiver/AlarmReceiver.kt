@@ -25,14 +25,11 @@ class AlarmReceiver : BroadcastReceiver() {
         val episodeNumber = intent.getIntExtra(EXTRA_EPISODE_NUMBER, 0)
         val episodeTitle = intent.getStringExtra(EXTRA_EPISODE_TITLE) ?: ""
 
-        // Create notification content
         val title = "Anime Reminder"
         val message = "It's time to watch $animeTitle Episode $episodeNumber: $episodeTitle"
 
-        // Create notification channel for Android O and above
         createNotificationChannel(context)
 
-        // Create intent for when notification is tapped
         val contentIntent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             context,
@@ -41,7 +38,6 @@ class AlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Build the notification
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle(title)
@@ -51,7 +47,6 @@ class AlarmReceiver : BroadcastReceiver() {
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
 
-        // Show the notification
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
