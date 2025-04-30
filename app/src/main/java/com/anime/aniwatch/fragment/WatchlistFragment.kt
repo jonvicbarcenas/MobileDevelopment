@@ -1,5 +1,6 @@
 package com.anime.aniwatch.fragment
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
@@ -150,11 +151,19 @@ class WatchlistFragment: Fragment() {
             calendar.set(Calendar.MINUTE, selectedMinute)
             calendar.set(Calendar.SECOND, 0)
 
+            // Check if the selected time is in the future
+            val currentTime = System.currentTimeMillis()
+            if (calendar.timeInMillis <= currentTime) {
+                Toast.makeText(context, "Please select a future time for the reminder", Toast.LENGTH_SHORT).show()
+                return@TimePickerDialog
+            }
+
             // Schedule the reminder
             scheduleReminder(context, calendar.timeInMillis, episode)
         }, hour, minute, true).show()
     }
 
+    @SuppressLint("ScheduleExactAlarm")
     private fun scheduleReminder(context: Context, reminderTime: Long, episode: WatchlistEpisode) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java).apply {
