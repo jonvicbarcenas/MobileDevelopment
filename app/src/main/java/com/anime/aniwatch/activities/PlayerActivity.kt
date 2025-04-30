@@ -22,7 +22,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var playerView: StyledPlayerView
 
-    
+
     private lateinit var playerManager: PlayerManager
     private lateinit var fullscreenManager: FullscreenManager
     private lateinit var episodeSourceFetcher: EpisodeSourceFetcher
@@ -37,16 +37,16 @@ class PlayerActivity : AppCompatActivity() {
         val animeTitleText: TextView = findViewById(R.id.animeTitleText)
         val episodeTitleText: TextView = findViewById(R.id.episodeTitleText)
         val episodeNumberText: TextView = findViewById(R.id.episodeNumberText)
-        
+
         playerView = findViewById(R.id.playerView)
 
-        
+
         playerManager = PlayerManager(this, playerView)
         fullscreenManager = FullscreenManager(this, playerView)
         episodeSourceFetcher = EpisodeSourceFetcher(this)
         watchHistoryManager = WatchHistoryManager(this)
         episodeDetailsManager = EpisodeDetailsManager(this)
-        
+
 
 
 
@@ -62,7 +62,7 @@ class PlayerActivity : AppCompatActivity() {
 
         val episodeId = intent.getStringExtra("EPISODE_ID")
         val animeId = intent.getStringExtra("ANIME_ID")
-        
+
         if (episodeId.isNullOrEmpty()) {
             Toast.makeText(this, "Invalid episode ID", Toast.LENGTH_SHORT).show()
             finish()
@@ -70,27 +70,35 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         fetchEpisodeSources(episodeId)
-        
+
         loadEpisodeFragment(animeId.toString())
-        
+
         if (animeId != null && episodeId != null) {
-            episodeDetailsManager.fetchEpisodeDetails(
-                animeId, 
-                episodeId, 
-                animeTitleText, 
-                episodeTitleText, 
-                episodeNumberText
+            episodeDetailsManager.fetchEpisodeDetailsWithCallback(
+                animeId,
+                episodeId,
+                object : EpisodeDetailsManager.EpisodeDetailsCallback {
+                    override fun onDetailsLoaded(animeTitle: String, episodeTitle: String, episodeNumber: Int) {
+                        animeTitleText.text = animeTitle
+                        episodeTitleText.text = episodeTitle
+                        episodeNumberText.text = "Episode: $episodeNumber"
+
+                        Toast.makeText(this@PlayerActivity, "You Are Watching $animeTitle", Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onError(message: String) {
+                        Toast.makeText(this@PlayerActivity, message, Toast.LENGTH_SHORT).show()
+                    }
+                }
             )
         }
-        
-        Toast.makeText(this, "Anime ID: $animeId", Toast.LENGTH_SHORT).show()
     }
 
     private fun fetchEpisodeSources(episodeId: String) {
         episodeSourceFetcher.fetchEpisodeSources(episodeId, object : EpisodeSourceFetcher.EpisodeSourceCallback {
             override fun onSourceFetched(hlsUrl: String, tracks: List<Track>, referer: String) {
                 val animeId = intent.getStringExtra("ANIME_ID") ?: return
-                
+
                 watchHistoryManager.getWatchedTime(episodeId, animeId) { savedWatchedTime ->
                     playerManager.preparePlayer(hlsUrl, tracks, referer, savedWatchedTime)
                 }
@@ -120,19 +128,30 @@ class PlayerActivity : AppCompatActivity() {
 
             fetchEpisodeSources(newEpisodeId)
             loadEpisodeFragment(newAnimeId)
-            episodeDetailsManager.fetchEpisodeDetails(
+
+            episodeDetailsManager.fetchEpisodeDetailsWithCallback(
                 newAnimeId,
                 newEpisodeId,
-                findViewById(R.id.animeTitleText),
-                findViewById(R.id.episodeTitleText),
-                findViewById(R.id.episodeNumberText)
+                object : EpisodeDetailsManager.EpisodeDetailsCallback {
+                    override fun onDetailsLoaded(animeTitle: String, episodeTitle: String, episodeNumber: Int) {
+                        findViewById<TextView>(R.id.animeTitleText).text = animeTitle
+                        findViewById<TextView>(R.id.episodeTitleText).text = episodeTitle
+                        findViewById<TextView>(R.id.episodeNumberText).text = "Episode: $episodeNumber"
+
+                        Toast.makeText(this@PlayerActivity, "You Are Watching $animeTitle", Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onError(message: String) {
+                        Toast.makeText(this@PlayerActivity, message, Toast.LENGTH_SHORT).show()
+                    }
+                }
             )
         }
     }
 
     override fun onPause() {
         super.onPause()
-        
+
         // Save watch history
         val episodeId = intent.getStringExtra("EPISODE_ID") ?: return
         val animeId = intent.getStringExtra("ANIME_ID") ?: return
@@ -140,7 +159,7 @@ class PlayerActivity : AppCompatActivity() {
         val episodeTitle = findViewById<TextView>(R.id.episodeTitleText).text.toString()
         val episodeNumber = findViewById<TextView>(R.id.episodeNumberText).text.toString()
             .replace("Episode: ", "").toIntOrNull() ?: 0
-        
+
         watchHistoryManager.saveWatchHistory(
             episodeId,
             animeId,
@@ -150,7 +169,7 @@ class PlayerActivity : AppCompatActivity() {
             playerManager.getCurrentPosition(),
             playerManager.getDuration()
         )
-        
+
         playerManager.releasePlayer()
     }
 
