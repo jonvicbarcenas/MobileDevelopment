@@ -87,7 +87,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/emailadd"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginTop="96dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginEnd="134dp"
                     android:backgroundTint="@color/blue"
                     android:text="Update"
