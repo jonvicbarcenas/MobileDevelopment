@@ -15,9 +15,14 @@ jobs:
 
       - name: Update version.json
         run: |
+          # Read existing features from version.json
+          FEATURES=$(jq -c '.features' version.json 2>/dev/null || echo '["Comment System on Episodes", "Update UI/UX Design", "Fix some bugs"]')
+          
+          # Create new version.json with existing features
           echo "{
             \"version\": \"${{ github.event.release.tag_name }}\",
-            \"url\": \"${{ github.event.release.html_url }}\"
+            \"url\": \"${{ github.event.release.html_url }}\",
+            \"features\": $FEATURES
           }" > version.json
 
       - name: Commit and push changes

@@ -1,4 +1,9 @@
 {
   "version": "v1.2.3",
-  "url": "https://github.com/jonvicbarcenas/MobileDevelopment/releases/tag/v1.2.3"
+  "url": "https://github.com/jonvicbarcenas/MobileDevelopment/releases/tag/v1.2.3",
+  "features": [
+    "Comment System on Episodes",
+    "Update UI/UX Design",
+    "Fix some bugs"
+  ]
 }

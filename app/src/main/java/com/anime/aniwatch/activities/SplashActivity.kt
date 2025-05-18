@@ -19,6 +19,7 @@ class SplashActivity : AppCompatActivity() {
     private lateinit var binding: SplashBinding
     private val versionUrl = "https://jonvicbarcenas.github.io/MobileDevelopment/version.json"
     private var latestVersion: String? = null
+    private var featuresList: List<String> = listOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +52,16 @@ class SplashActivity : AppCompatActivity() {
                     val responseBody = response.body?.string()
                     val jsonObject = JSONObject(responseBody ?: "")
                     latestVersion = jsonObject.getString("version").removePrefix("v")
+                    
+                    // Parse features array if available
+                    if (jsonObject.has("features")) {
+                        val featuresArray = jsonObject.getJSONArray("features")
+                        val features = mutableListOf<String>()
+                        for (i in 0 until featuresArray.length()) {
+                            features.add(featuresArray.getString(i))
+                        }
+                        featuresList = features
+                    }
 
                     runOnUiThread {
                         handler.removeCallbacks(timeoutRunnable)
@@ -82,9 +93,20 @@ class SplashActivity : AppCompatActivity() {
         }.start()
     }
     private fun showUpdatePrompt() {
+        // Build features text
+        val featuresText = if (featuresList.isNotEmpty()) {
+            val sb = StringBuilder("\n\nNew Features:\n")
+            featuresList.forEachIndexed { index, feature ->
+                sb.append("${index + 1}. $feature\n")
+            }
+            sb.toString()
+        } else {
+            ""
+        }
+        
         AlertDialog.Builder(this)
             .setTitle("Update Available")
-            .setMessage("A new version of the app is available. Please update to continue.")
+            .setMessage("A new version of the app is available. Please update to continue.$featuresText")
             .setPositiveButton("Update") { _, _ ->
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.data = android.net.Uri.parse("https://github.com/jonvicbarcenas/MobileDevelopment/releases/download/v$latestVersion/app-release.apk")
