@@ -1,10 +1,4 @@
 {
   "version": "v1.2.4",
-  "url": "https://github.com/jonvicbarcenas/MobileDevelopment/releases/tag/v1.2.4",
-  "features": [
-    "Added dark mode support",
-    "Improved video playback performance",
-    "Fixed bugs in search functionality",
-    "Added new anime categories"
-  ]
+  "url": "https://github.com/jonvicbarcenas/MobileDevelopment/releases/tag/v1.2.4"
 }
