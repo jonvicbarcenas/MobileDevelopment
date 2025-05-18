@@ -1,12 +1,5 @@
 {
-  "version": "v1.2.7",
-  "url": "https://github.com/jonvicbarcenas/MobileDevelopment/releases/tag/v1.2.7",
-  "features": [
-    "Comment System on Episodes",
-    "Update UI/UX Design",
-    "Fix some bugs",
-    "Display comment count in Comments tab",
-    "Mandatory username requirement for all users",
-    "Fixed username collection during signup process"
-  ]
+  "version": "v1.2.6",
+  "url": "https://github.com/jonvicbarcenas/MobileDevelopment/releases/tag/v1.2.6",
+  "features": ["Comment System on Episodes","Update UI/UX Design","Fix some bugs","Display comment count in Comments tab","Mandatory username requirement for all users","Fixed username collection during signup process"]
 }
