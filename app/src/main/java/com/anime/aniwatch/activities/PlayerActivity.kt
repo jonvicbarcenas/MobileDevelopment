@@ -23,6 +23,10 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -37,6 +41,7 @@ class PlayerActivity : AppCompatActivity() {
     private var currentEpisodeId: String? = null
     private var currentAnimeId: String? = null
     private var pagerAdapter: PlayerPagerAdapter? = null
+    private var commentsCountListener: ValueEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +87,7 @@ class PlayerActivity : AppCompatActivity() {
 
         fetchEpisodeSources(episodeId)
         setupViewPager(animeId.toString(), episodeId)
+        fetchCommentsCount(episodeId)
 
         if (animeId != null && episodeId != null) {
             episodeDetailsManager.fetchEpisodeDetailsWithCallback(
@@ -120,6 +126,31 @@ class PlayerActivity : AppCompatActivity() {
                 else -> null
             }
         }.attach()
+    }
+
+    private fun fetchCommentsCount(episodeId: String) {
+        val database = FirebaseDatabase.getInstance()
+        val commentsRef = database.getReference("comments").child(episodeId)
+        
+        commentsCountListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val count = snapshot.childrenCount
+                updateCommentsTabText(count)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Keep default tab text if there's an error
+            }
+        }
+        
+        commentsRef.addValueEventListener(commentsCountListener!!)
+    }
+    
+    private fun updateCommentsTabText(count: Long) {
+        if (tabLayout.tabCount >= 2) {
+            val tab = tabLayout.getTabAt(1)
+            tab?.text = "Comments ($count)"
+        }
     }
 
     private class PlayerPagerAdapter(
@@ -192,6 +223,7 @@ class PlayerActivity : AppCompatActivity() {
 
             fetchEpisodeSources(newEpisodeId)
             setupViewPager(newAnimeId, newEpisodeId)
+            fetchCommentsCount(newEpisodeId)
 
             episodeDetailsManager.fetchEpisodeDetailsWithCallback(
                 newAnimeId,
@@ -260,6 +292,12 @@ class PlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         playerManager.releasePlayer()
+        commentsCountListener?.let { 
+            if (currentEpisodeId != null) {
+                FirebaseDatabase.getInstance().getReference("comments").child(currentEpisodeId!!)
+                    .removeEventListener(it)
+            }
+        }
     }
 
     override fun onBackPressed() {

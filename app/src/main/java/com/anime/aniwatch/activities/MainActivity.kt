@@ -19,6 +19,15 @@ import com.anime.aniwatch.fragment.HomeFragment
 import com.anime.aniwatch.fragment.ListFragment
 import com.google.firebase.FirebaseApp
 import android.Manifest
+import android.content.Context
+import android.view.LayoutInflater
+import android.widget.EditText
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +35,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var isFragmentTransactionInProgress = false
     private val fragmentTransactionDebounceTime = 300L
+    private val USER_PREFS = "userPrefs"
+    private val USERNAME_KEY = "username"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         showDisclaimerDialog()
+        checkUsername()
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
@@ -70,6 +82,98 @@ class MainActivity : AppCompatActivity() {
                     1
                 )
             }
+        }
+    }
+
+    private fun checkUsername() {
+        val auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser
+        
+        // First check local storage
+        val sharedPreferences = getSharedPreferences(USER_PREFS, Context.MODE_PRIVATE)
+        val localUsername = sharedPreferences.getString(USERNAME_KEY, null)
+        
+        if (!localUsername.isNullOrEmpty()) {
+            // Username exists locally, no need to show dialog
+            return
+        }
+        
+        // If no local username, check Firebase
+        if (currentUser != null) {
+            val uid = currentUser.uid
+            val databaseReference = FirebaseDatabase.getInstance().getReference("Users")
+            
+            databaseReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists() && snapshot.hasChild("username")) {
+                        val username = snapshot.child("username").getValue(String::class.java)
+                        if (!username.isNullOrEmpty()) {
+                            // Save username locally
+                            sharedPreferences.edit().putString(USERNAME_KEY, username).apply()
+                            return
+                        }
+                    }
+                    
+                    // No username found, show dialog
+                    showUsernameDialog()
+                }
+                
+                override fun onCancelled(error: DatabaseError) {
+                    // On error, show dialog to be safe
+                    showUsernameDialog()
+                }
+            })
+        } else {
+            // User not logged in, show dialog
+            showUsernameDialog()
+        }
+    }
+    
+    private fun showUsernameDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_username, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+            
+        val usernameInput = dialogView.findViewById<EditText>(R.id.username_input)
+        val confirmButton = dialogView.findViewById<Button>(R.id.confirm_button)
+        
+        confirmButton.setOnClickListener {
+            val username = usernameInput.text.toString().trim()
+            
+            if (username.isEmpty()) {
+                Toast.makeText(this, "Username cannot be empty", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            saveUsername(username)
+            dialog.dismiss()
+        }
+        
+        dialog.show()
+    }
+    
+    private fun saveUsername(username: String) {
+        // Save locally
+        val sharedPreferences = getSharedPreferences(USER_PREFS, Context.MODE_PRIVATE)
+        sharedPreferences.edit().putString(USERNAME_KEY, username).apply()
+        
+        // Save to Firebase if user is logged in
+        val auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser
+        
+        if (currentUser != null) {
+            val uid = currentUser.uid
+            val databaseReference = FirebaseDatabase.getInstance().getReference("Users")
+            
+            databaseReference.child(uid).child("username").setValue(username)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Username saved successfully", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Failed to save username online, but saved locally", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 

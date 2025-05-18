@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# update the version.json on my project every after implemented a new feature
+
+- [version.json](mdc:version.json)

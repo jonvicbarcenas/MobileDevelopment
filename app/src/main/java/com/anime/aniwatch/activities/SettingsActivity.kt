@@ -14,6 +14,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var adapter: ExpandableListAdapter
     private lateinit var listData: HashMap<String, List<List<String>>>
 
+    private val showDevelopersSection = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -92,12 +94,14 @@ class SettingsActivity : AppCompatActivity() {
 
             )
 
-        data["Developers"] = developers
+        // Only add developers section if showDevelopersSection is true
+        if (showDevelopersSection) {
+            data["Developers"] = developers
+        }
+        
         data["Privacy Policy"] = privacy
         data["Terms of Service"] = terms
         data["Third-party notices"] = third
-
-
 
         return data
     }
