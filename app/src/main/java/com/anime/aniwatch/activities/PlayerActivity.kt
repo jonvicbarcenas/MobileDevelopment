@@ -9,6 +9,7 @@ import android.content.res.Configuration
 import android.view.animation.AnimationUtils
 import android.widget.TextView
 import com.anime.aniwatch.fragment.EpisodeFragment
+import com.anime.aniwatch.fragment.CommentsFragment
 import com.anime.aniwatch.network.Track
 import com.anime.aniwatch.player.EpisodeDetailsManager
 import com.anime.aniwatch.player.EpisodeSourceFetcher
@@ -16,8 +17,12 @@ import com.anime.aniwatch.player.FullscreenManager
 import com.anime.aniwatch.player.PlayerManager
 import com.anime.aniwatch.player.WatchHistoryManager
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import android.widget.ImageView
-
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
+import androidx.viewpager2.widget.ViewPager2
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -27,7 +32,11 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var episodeSourceFetcher: EpisodeSourceFetcher
     private lateinit var watchHistoryManager: WatchHistoryManager
     private lateinit var episodeDetailsManager: EpisodeDetailsManager
-    private var currentEpisodeFragment: EpisodeFragment? = null
+    private lateinit var viewPager: ViewPager2
+    private lateinit var tabLayout: TabLayout
+    private var currentEpisodeId: String? = null
+    private var currentAnimeId: String? = null
+    private var pagerAdapter: PlayerPagerAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +52,8 @@ class PlayerActivity : AppCompatActivity() {
         nowPlayingLabel.startAnimation(pulseAnimation)
 
         playerView = findViewById(R.id.playerView)
+        viewPager = findViewById(R.id.viewPager)
+        tabLayout = findViewById(R.id.tabLayout)
 
         playerManager = PlayerManager(this, playerView)
         fullscreenManager = FullscreenManager(this, playerView)
@@ -60,6 +71,8 @@ class PlayerActivity : AppCompatActivity() {
 
         val episodeId = intent.getStringExtra("EPISODE_ID")
         val animeId = intent.getStringExtra("ANIME_ID")
+        currentEpisodeId = episodeId
+        currentAnimeId = animeId
 
         if (episodeId.isNullOrEmpty()) {
             Toast.makeText(this, "Invalid episode ID", Toast.LENGTH_SHORT).show()
@@ -68,8 +81,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         fetchEpisodeSources(episodeId)
-
-        loadEpisodeFragment(animeId.toString(), episodeId)
+        setupViewPager(animeId.toString(), episodeId)
 
         if (animeId != null && episodeId != null) {
             episodeDetailsManager.fetchEpisodeDetailsWithCallback(
@@ -80,6 +92,11 @@ class PlayerActivity : AppCompatActivity() {
                         animeTitleText.text = animeTitle
                         episodeTitleText.text = episodeTitle
                         episodeNumberText.text = "Episode: $episodeNumber"
+                        
+                        // Update episode title in the pager adapter
+                        pagerAdapter?.updateEpisodeTitle(episodeTitle)
+                        // Refresh the ViewPager to update the CommentsFragment with the new episode title
+                        viewPager.adapter = pagerAdapter
 
                         Toast.makeText(this@PlayerActivity, "You Are Watching $animeTitle", Toast.LENGTH_SHORT).show()
                     }
@@ -89,6 +106,53 @@ class PlayerActivity : AppCompatActivity() {
                     }
                 }
             )
+        }
+    }
+
+    private fun setupViewPager(animeId: String, episodeId: String) {
+        pagerAdapter = PlayerPagerAdapter(this, animeId, episodeId)
+        viewPager.adapter = pagerAdapter
+        
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> "Episodes"
+                1 -> "Comments"
+                else -> null
+            }
+        }.attach()
+    }
+
+    private class PlayerPagerAdapter(
+        activity: FragmentActivity,
+        private val animeId: String,
+        private val episodeId: String
+    ) : FragmentStateAdapter(activity) {
+
+        private var episodeTitle: String = ""
+        
+        fun updateEpisodeTitle(title: String) {
+            this.episodeTitle = title
+        }
+
+        override fun getItemCount(): Int = 2
+
+        override fun createFragment(position: Int): Fragment {
+            return when (position) {
+                0 -> EpisodeFragment().apply {
+                    arguments = Bundle().apply {
+                        putString("ANIME_ID", animeId)
+                        putString("CURRENT_EPISODE_ID", episodeId)
+                    }
+                }
+                1 -> CommentsFragment().apply {
+                    arguments = Bundle().apply {
+                        putString("EPISODE_ID", episodeId)
+                        putString("ANIME_ID", animeId)
+                        putString("EPISODE_TITLE", episodeTitle)
+                    }
+                }
+                else -> throw IllegalArgumentException("Invalid position: $position")
+            }
         }
     }
 
@@ -123,14 +187,11 @@ class PlayerActivity : AppCompatActivity() {
             playerManager.stopPlayer()
 
             this.intent = intent
+            currentEpisodeId = newEpisodeId
+            currentAnimeId = newAnimeId
 
             fetchEpisodeSources(newEpisodeId)
-            
-            // Update the currently playing episode in the fragment if it exists
-            currentEpisodeFragment?.updateCurrentlyPlayingEpisode(newEpisodeId) ?: run {
-                // If fragment doesn't exist yet, load it
-                loadEpisodeFragment(newAnimeId, newEpisodeId)
-            }
+            setupViewPager(newAnimeId, newEpisodeId)
 
             episodeDetailsManager.fetchEpisodeDetailsWithCallback(
                 newAnimeId,
@@ -140,6 +201,11 @@ class PlayerActivity : AppCompatActivity() {
                         findViewById<TextView>(R.id.animeTitleText).text = animeTitle
                         findViewById<TextView>(R.id.episodeTitleText).text = episodeTitle
                         findViewById<TextView>(R.id.episodeNumberText).text = "Episode: $episodeNumber"
+                        
+                        // Update episode title in the pager adapter
+                        pagerAdapter?.updateEpisodeTitle(episodeTitle)
+                        // Refresh the ViewPager to update the CommentsFragment with the new episode title
+                        viewPager.adapter = pagerAdapter
 
                         Toast.makeText(this@PlayerActivity, "You Are Watching $animeTitle", Toast.LENGTH_SHORT).show()
                     }
@@ -200,20 +266,5 @@ class PlayerActivity : AppCompatActivity() {
         if (!fullscreenManager.handleBackPressed()) {
             super.onBackPressed()
         }
-    }
-
-    private fun loadEpisodeFragment(animeId: String, episodeId: String) {
-        val episodeFragment = EpisodeFragment().apply {
-            arguments = Bundle().apply {
-                putString("ANIME_ID", animeId)
-                putString("CURRENT_EPISODE_ID", episodeId)
-            }
-        }
-        
-        currentEpisodeFragment = episodeFragment
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.episodeFragmentContainer, episodeFragment)
-            .commit()
     }
 }
