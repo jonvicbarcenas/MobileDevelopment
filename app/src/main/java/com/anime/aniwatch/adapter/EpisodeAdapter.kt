@@ -1,12 +1,18 @@
 package com.anime.aniwatch.adapter
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.anime.aniwatch.R
 import com.anime.aniwatch.data.WatchlistEpisode
@@ -27,6 +33,7 @@ class EpisodeAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var isLoading = true
+    private var currentlyPlayingEpisodeId: String? = null
 
     companion object {
         private const val VIEW_TYPE_LOADING = 0
@@ -37,6 +44,8 @@ class EpisodeAdapter(
         val episodeNumber: TextView = view.findViewById(R.id.episodeNumber)
         val episodeTitle: TextView = view.findViewById(R.id.episodeTitle)
         val addToWatchlistButton: ImageButton = view.findViewById(R.id.addToWatchlistButton)
+        val episodeContainer: View = view.findViewById(R.id.episodeContainer)
+        val nowPlayingIndicator: View? = view.findViewById(R.id.nowPlayingIndicator)
     }
 
     class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -70,20 +79,59 @@ class EpisodeAdapter(
                 holder.episodeNumber.text = "Episode ${episode.number}"
                 holder.episodeTitle.text = episode.title
 
+                // Check if this is the currently playing episode
+                val isCurrentlyPlaying = episode.episodeId == currentlyPlayingEpisodeId
+                
+                if (isCurrentlyPlaying) {
+                    // Apply highlight animation and styling for currently playing episode
+                    val pulseAnimation = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.pulse_animation)
+                    holder.episodeContainer.startAnimation(pulseAnimation)
+                    
+                    // Set background color with animation
+                    val colorFrom = Color.TRANSPARENT
+                    val colorTo = Color.parseColor("#33FFFFFF") // Semi-transparent white
+                    val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), colorFrom, colorTo)
+                    colorAnimation.duration = 500
+                    colorAnimation.addUpdateListener { animator ->
+                        holder.episodeContainer.setBackgroundColor(animator.animatedValue as Int)
+                    }
+                    colorAnimation.start()
+                    
+                    // Show the now playing indicator
+                    holder.nowPlayingIndicator?.visibility = View.VISIBLE
+                    
+                    // Make text more prominent
+                    holder.episodeNumber.setTextColor(Color.WHITE)
+                    holder.episodeTitle.setTextColor(Color.WHITE)
+                    holder.episodeNumber.textSize = 18f
+                    holder.episodeTitle.textSize = 16f
+                } else {
+                    // Reset styling for non-playing episodes
+                    holder.episodeContainer.clearAnimation()
+                    holder.episodeContainer.setBackgroundColor(Color.TRANSPARENT)
+                    holder.nowPlayingIndicator?.visibility = View.GONE
+                    holder.episodeNumber.textSize = 16f
+                    holder.episodeTitle.textSize = 14f
+                    
+                    // Check if episode is in history to gray it out
+                    WatchHistoryUtil.isInHistory(animeId, episode.episodeId) { isInHistory ->
+                        if (holder.adapterPosition == position) {
+                            if (isInHistory) {
+                                holder.episodeNumber.setTextColor(Color.GRAY)
+                                holder.episodeTitle.setTextColor(Color.GRAY)
+                            } else {
+                                holder.episodeNumber.setTextColor(Color.WHITE)
+                                holder.episodeTitle.setTextColor(Color.parseColor("#BBBBBB"))
+                            }
+                        }
+                    }
+                }
+
                 holder.itemView.setOnClickListener {
                     onEpisodeClick(episode)
                 }
 
                 holder.addToWatchlistButton.setOnClickListener(null)
-
-                WatchHistoryUtil.isInHistory(animeId, episode.episodeId) { isInHistory ->
-                    if (holder.adapterPosition == position) {
-                        if (isInHistory) {
-                            holder.episodeNumber.setTextColor(Color.GRAY)
-                            holder.episodeTitle.setTextColor(Color.GRAY)
-                        }
-                    }
-                }
 
                 WatchlistUtil.isInWatchlist("", episode.episodeId) { isInWatchlist ->
                     if (holder.adapterPosition == position) {
@@ -125,7 +173,6 @@ class EpisodeAdapter(
         }
     }
 
-
     override fun getItemCount(): Int {
         return if (isLoading) {
             10
@@ -140,11 +187,31 @@ class EpisodeAdapter(
         notifyDataSetChanged()
     }
 
-
     fun setLoading(loading: Boolean) {
         if (isLoading != loading) {
             isLoading = loading
             notifyDataSetChanged()
+        }
+    }
+    
+    fun setCurrentlyPlayingEpisode(episodeId: String?) {
+        val oldPlayingEpisodeId = currentlyPlayingEpisodeId
+        currentlyPlayingEpisodeId = episodeId
+        
+        if (oldPlayingEpisodeId != null) {
+            val oldIndex = episodes.indexOfFirst { it.episodeId == oldPlayingEpisodeId }
+            if (oldIndex >= 0) {
+                notifyItemChanged(oldIndex)
+            }
+        }
+        
+        if (episodeId != null) {
+            val newIndex = episodes.indexOfFirst { it.episodeId == episodeId }
+            if (newIndex >= 0) {
+                notifyItemChanged(newIndex)
+                // Scroll to the currently playing episode
+                // This will be handled by the fragment
+            }
         }
     }
 }

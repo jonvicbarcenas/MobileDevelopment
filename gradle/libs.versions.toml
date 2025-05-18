@@ -39,6 +39,7 @@ googleid = "1.1.1"
 firebaseMessagingKtx = "24.1.1"
 firebaseInappmessagingDisplay = "21.0.2"
 firebaseMessaging = "24.1.1"
+firebaseFirestoreKtx = "25.1.4"
 
 
 [libraries]
@@ -92,6 +93,7 @@ googleid = { group = "com.google.android.libraries.identity.googleid", name = "g
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 
 
 [plugins]

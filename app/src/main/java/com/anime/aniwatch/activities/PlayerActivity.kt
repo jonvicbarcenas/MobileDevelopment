@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.anime.aniwatch.R
 import android.content.res.Configuration
+import android.view.animation.AnimationUtils
 import android.widget.TextView
 import com.anime.aniwatch.fragment.EpisodeFragment
 import com.anime.aniwatch.network.Track
@@ -21,14 +22,12 @@ import android.widget.ImageView
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var playerView: StyledPlayerView
-
-
     private lateinit var playerManager: PlayerManager
     private lateinit var fullscreenManager: FullscreenManager
     private lateinit var episodeSourceFetcher: EpisodeSourceFetcher
     private lateinit var watchHistoryManager: WatchHistoryManager
     private lateinit var episodeDetailsManager: EpisodeDetailsManager
-
+    private var currentEpisodeFragment: EpisodeFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,20 +36,19 @@ class PlayerActivity : AppCompatActivity() {
         val animeTitleText: TextView = findViewById(R.id.animeTitleText)
         val episodeTitleText: TextView = findViewById(R.id.episodeTitleText)
         val episodeNumberText: TextView = findViewById(R.id.episodeNumberText)
+        val nowPlayingLabel: TextView = findViewById(R.id.nowPlayingLabel)
+
+        // Apply pulsing animation to NOW PLAYING label
+        val pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.text_pulse_animation)
+        nowPlayingLabel.startAnimation(pulseAnimation)
 
         playerView = findViewById(R.id.playerView)
-
 
         playerManager = PlayerManager(this, playerView)
         fullscreenManager = FullscreenManager(this, playerView)
         episodeSourceFetcher = EpisodeSourceFetcher(this)
         watchHistoryManager = WatchHistoryManager(this)
         episodeDetailsManager = EpisodeDetailsManager(this)
-
-
-
-
-
 
         playerView.setControllerOnFullScreenModeChangedListener { isFullScreen ->
             if (isFullScreen) {
@@ -71,7 +69,7 @@ class PlayerActivity : AppCompatActivity() {
 
         fetchEpisodeSources(episodeId)
 
-        loadEpisodeFragment(animeId.toString())
+        loadEpisodeFragment(animeId.toString(), episodeId)
 
         if (animeId != null && episodeId != null) {
             episodeDetailsManager.fetchEpisodeDetailsWithCallback(
@@ -127,7 +125,12 @@ class PlayerActivity : AppCompatActivity() {
             this.intent = intent
 
             fetchEpisodeSources(newEpisodeId)
-            loadEpisodeFragment(newAnimeId)
+            
+            // Update the currently playing episode in the fragment if it exists
+            currentEpisodeFragment?.updateCurrentlyPlayingEpisode(newEpisodeId) ?: run {
+                // If fragment doesn't exist yet, load it
+                loadEpisodeFragment(newAnimeId, newEpisodeId)
+            }
 
             episodeDetailsManager.fetchEpisodeDetailsWithCallback(
                 newAnimeId,
@@ -176,6 +179,11 @@ class PlayerActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         playerManager.resumePlayer()
+        
+        // Re-apply animation when resuming
+        val nowPlayingLabel: TextView = findViewById(R.id.nowPlayingLabel)
+        val pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.text_pulse_animation)
+        nowPlayingLabel.startAnimation(pulseAnimation)
     }
 
     override fun onStop() {
@@ -194,12 +202,15 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadEpisodeFragment(animeId: String) {
+    private fun loadEpisodeFragment(animeId: String, episodeId: String) {
         val episodeFragment = EpisodeFragment().apply {
             arguments = Bundle().apply {
                 putString("ANIME_ID", animeId)
+                putString("CURRENT_EPISODE_ID", episodeId)
             }
         }
+        
+        currentEpisodeFragment = episodeFragment
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.episodeFragmentContainer, episodeFragment)

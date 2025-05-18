@@ -28,9 +28,11 @@ class EpisodeFragment : Fragment() {
 
     private lateinit var episodeAdapter: EpisodeAdapter
     private lateinit var recyclerView: RecyclerView
+    private lateinit var layoutManager: LinearLayoutManager
 
     private var animeTitle: String = ""
     private var animePosterUrl: String = ""
+    private var currentlyPlayingEpisodeId: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,9 +40,11 @@ class EpisodeFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_episode, container, false)
         recyclerView = view.findViewById(R.id.episodeRecyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = layoutManager
 
         val animeId = arguments?.getString("ANIME_ID") ?: ""
+        currentlyPlayingEpisodeId = arguments?.getString("CURRENT_EPISODE_ID")
 
         // Fetch anime details first to get title and poster URL
         fetchAnimeDetails(animeId)
@@ -113,6 +117,12 @@ class EpisodeFragment : Fragment() {
                     val episodes = response.body()?.data?.episodes ?: emptyList()
                     // updateEpisodes automatically sets isLoading to false
                     episodeAdapter.updateEpisodes(episodes)
+                    
+                    // Set currently playing episode and scroll to it
+                    currentlyPlayingEpisodeId?.let { episodeId ->
+                        episodeAdapter.setCurrentlyPlayingEpisode(episodeId)
+                        scrollToCurrentEpisode(episodes, episodeId)
+                    }
                 } else {
                     // Set loading to false even if there's an error
                     episodeAdapter.setLoading(false)
@@ -126,5 +136,41 @@ class EpisodeFragment : Fragment() {
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+    
+    private fun scrollToCurrentEpisode(episodes: List<Episode>, episodeId: String) {
+        val index = episodes.indexOfFirst { it.episodeId == episodeId }
+        if (index >= 0) {
+            layoutManager.scrollToPositionWithOffset(index, 20)
+        }
+    }
+    
+    fun updateCurrentlyPlayingEpisode(episodeId: String) {
+        currentlyPlayingEpisodeId = episodeId
+        if (::episodeAdapter.isInitialized) {
+            episodeAdapter.setCurrentlyPlayingEpisode(episodeId)
+            
+            // Get the current episodes from the adapter
+            val episodes = mutableListOf<Episode>()
+            for (i in 0 until episodeAdapter.itemCount) {
+                if (!episodeAdapter.getItemViewType(i).equals(0)) { // Not loading view type
+                    // This is a bit of a hack since we don't have direct access to the episodes list
+                    // In a real app, you might want to refactor to make this cleaner
+                    try {
+                        val episode = episodeAdapter.javaClass.getDeclaredField("episodes")
+                            .apply { isAccessible = true }
+                            .get(episodeAdapter) as? List<Episode>
+                        if (episode != null) {
+                            episodes.addAll(episode)
+                            break
+                        }
+                    } catch (e: Exception) {
+                        // Handle reflection exception
+                    }
+                }
+            }
+            
+            scrollToCurrentEpisode(episodes, episodeId)
+        }
     }
 }
