@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.anime.aniwatch.R
 import com.anime.aniwatch.data.WatchHistory
 import com.anime.aniwatch.adapter.HistoryAdapter
+import com.anime.aniwatch.data.UserStreak
 import com.anime.aniwatch.network.AnimeResponse
 import com.anime.aniwatch.network.ApiService
 import com.anime.aniwatch.util.Constants
@@ -32,6 +33,7 @@ class HistoryFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var historyAdapter: HistoryAdapter
     private lateinit var database: DatabaseReference
+    private lateinit var streakDatabase: DatabaseReference
     private lateinit var auth: FirebaseAuth
     private lateinit var emptyHistoryText: TextView
     private val watchHistoryList = mutableListOf<WatchHistory>()
@@ -52,8 +54,10 @@ class HistoryFragment : Fragment() {
 
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().getReference("WatchHistory")
+        streakDatabase = FirebaseDatabase.getInstance().getReference("UserStreaks")
 
         fetchWatchHistory()
+        updateUserStreak()
 
         return view
     }
@@ -77,6 +81,88 @@ class HistoryFragment : Fragment() {
 
             override fun onFailure(call: Call<AnimeResponse>, t: Throwable) {
                 callback(null)
+            }
+        })
+    }
+
+    private fun updateUserStreak() {
+        val userId = auth.currentUser?.uid ?: return
+        val currentDate = UserStreak.getCurrentDateString()
+        
+        // First, check if there are any watch history entries for today
+        database.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var hasWatchedToday = false
+                var mostRecentWatchDate = ""
+                
+                // Find the most recent watch history entry
+                for (historySnapshot in snapshot.children) {
+                    val watchHistory = historySnapshot.getValue(WatchHistory::class.java)
+                    if (watchHistory != null && watchHistory.dateWatched.isNotEmpty()) {
+                        val watchDate = UserStreak.extractDateFromTimestamp(watchHistory.dateWatched)
+                        
+                        // Check if watched today
+                        if (watchDate == currentDate) {
+                            hasWatchedToday = true
+                        }
+                        
+                        // Keep track of most recent watch date
+                        if (mostRecentWatchDate.isEmpty() || watchHistory.dateWatched > mostRecentWatchDate) {
+                            mostRecentWatchDate = watchHistory.dateWatched
+                        }
+                    }
+                }
+                
+                // Only update streak if user has watched something today
+                if (hasWatchedToday) {
+                    updateStreakData(userId, currentDate)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(requireContext(), "Failed to check watch history", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+    
+    private fun updateStreakData(userId: String, currentDate: String) {
+        streakDatabase.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val userStreak = snapshot.getValue(UserStreak::class.java) ?: UserStreak()
+                
+                if (userStreak.lastWatchDate.isEmpty()) {
+                    // First time user is watching something
+                    userStreak.currentStreak = 1
+                    userStreak.longestStreak = 1
+                    userStreak.lastWatchDate = currentDate
+                    userStreak.streakDates.add(currentDate)
+                } else if (UserStreak.isConsecutiveDay(userStreak.lastWatchDate, currentDate)) {
+                    // Check if we already counted today
+                    val lastDateClean = UserStreak.extractDateFromTimestamp(userStreak.lastWatchDate)
+                    if (lastDateClean != currentDate) {
+                        userStreak.currentStreak++
+                        userStreak.lastWatchDate = currentDate
+                        userStreak.streakDates.add(currentDate)
+                        
+                        // Update longest streak if current is longer
+                        if (userStreak.currentStreak > userStreak.longestStreak) {
+                            userStreak.longestStreak = userStreak.currentStreak
+                        }
+                    }
+                } else if (UserStreak.extractDateFromTimestamp(userStreak.lastWatchDate) != currentDate) {
+                    // Streak broken, reset to 1
+                    userStreak.currentStreak = 1
+                    userStreak.lastWatchDate = currentDate
+                    userStreak.streakDates.clear()
+                    userStreak.streakDates.add(currentDate)
+                }
+                
+                // Save updated streak data
+                streakDatabase.child(userId).setValue(userStreak)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(requireContext(), "Failed to update streak", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -125,4 +211,5 @@ class HistoryFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed to load history", Toast.LENGTH_SHORT).show()
             }
         })
-    }}
+    }
+}

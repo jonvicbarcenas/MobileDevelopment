@@ -1,12 +1,13 @@
 {
-  "version": "v1.2.7",
-  "url": "https://github.com/jonvicbarcenas/MobileDevelopment/releases/tag/v1.2.7",
+  "version": "v1.3.0",
+  "url": "https://github.com/jonvicbarcenas/MobileDevelopment/releases/tag/v1.3.0",
   "features": [
     "Comment System on Episodes",
     "Update UI/UX Design",
     "Fix some bugs",
     "Display comment count in Comments tab",
-    "Mandatory username requirement for all users",
-    "Fixed username collection during signup process"
+    "Fixed username collection during signup process",
+    "Fixed bottom navigation icons and text visibility in light mode",
+    "Added watching streak feature to track daily anime viewing"
   ]
 }

@@ -24,6 +24,8 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.anime.aniwatch.R
 import com.anime.aniwatch.activities.NotificationsActivity
 import com.anime.aniwatch.activities.SettingsActivity
+import com.anime.aniwatch.data.UserStreak
+import com.anime.aniwatch.data.WatchHistory
 
 class AccountFragment : Fragment() {
 
@@ -31,6 +33,8 @@ class AccountFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
     private lateinit var databaseReference: DatabaseReference
+    private lateinit var streakDatabaseReference: DatabaseReference
+    private lateinit var watchHistoryReference: DatabaseReference
 
     private lateinit var userData: UserProfileData
 
@@ -53,6 +57,8 @@ class AccountFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         val uid = auth.currentUser?.uid
         databaseReference = FirebaseDatabase.getInstance().getReference("Users")
+        streakDatabaseReference = FirebaseDatabase.getInstance().getReference("UserStreaks")
+        watchHistoryReference = FirebaseDatabase.getInstance().getReference("WatchHistory")
 
         userData = loadUserDataFromLocal()
 
@@ -116,6 +122,12 @@ class AccountFragment : Fragment() {
                     }
                 }
             })
+            
+            // Load user streak data
+            loadUserStreakData(uid)
+            
+            // Check if we need to update the streak based on watch history
+            checkAndUpdateStreak(uid)
         }
 
         binding.editProfile.setOnClickListener {
@@ -141,6 +153,124 @@ class AccountFragment : Fragment() {
         binding.logout.setOnClickListener {
             showLogoutDialog()
         }
+    }
+    
+    private fun checkAndUpdateStreak(uid: String) {
+        val currentDate = UserStreak.getCurrentDateString()
+        
+        watchHistoryReference.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var hasWatchedToday = false
+                var mostRecentWatchDate = ""
+                
+                for (historySnapshot in snapshot.children) {
+                    val watchHistory = historySnapshot.getValue(WatchHistory::class.java)
+                    if (watchHistory != null && watchHistory.dateWatched.isNotEmpty()) {
+                        val watchDate = UserStreak.extractDateFromTimestamp(watchHistory.dateWatched)
+                        
+                        // Check if watched today
+                        if (watchDate == currentDate) {
+                            hasWatchedToday = true
+                        }
+                        
+                        // Keep track of most recent watch date
+                        if (mostRecentWatchDate.isEmpty() || watchHistory.dateWatched > mostRecentWatchDate) {
+                            mostRecentWatchDate = watchHistory.dateWatched
+                        }
+                    }
+                }
+                
+                // Only update streak if user has watched something today
+                if (hasWatchedToday) {
+                    updateStreakData(uid, currentDate)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("AccountFragment", "Failed to check watch history: ${error.message}")
+            }
+        })
+    }
+    
+    private fun updateStreakData(userId: String, currentDate: String) {
+        streakDatabaseReference.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val userStreak = snapshot.getValue(UserStreak::class.java) ?: UserStreak()
+                
+                if (userStreak.lastWatchDate.isEmpty()) {
+                    // First time user is watching something
+                    userStreak.currentStreak = 1
+                    userStreak.longestStreak = 1
+                    userStreak.lastWatchDate = currentDate
+                    userStreak.streakDates.add(currentDate)
+                } else if (UserStreak.isConsecutiveDay(userStreak.lastWatchDate, currentDate)) {
+                    // Check if we already counted today
+                    val lastDateClean = UserStreak.extractDateFromTimestamp(userStreak.lastWatchDate)
+                    if (lastDateClean != currentDate) {
+                        userStreak.currentStreak++
+                        userStreak.lastWatchDate = currentDate
+                        userStreak.streakDates.add(currentDate)
+                        
+                        // Update longest streak if current is longer
+                        if (userStreak.currentStreak > userStreak.longestStreak) {
+                            userStreak.longestStreak = userStreak.currentStreak
+                        }
+                    }
+                } else if (UserStreak.extractDateFromTimestamp(userStreak.lastWatchDate) != currentDate) {
+                    // Streak broken, reset to 1
+                    userStreak.currentStreak = 1
+                    userStreak.lastWatchDate = currentDate
+                    userStreak.streakDates.clear()
+                    userStreak.streakDates.add(currentDate)
+                }
+                
+                // Save updated streak data
+                streakDatabaseReference.child(userId).setValue(userStreak)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("AccountFragment", "Failed to update streak: ${error.message}")
+            }
+        })
+    }
+    
+    private fun loadUserStreakData(uid: String) {
+        streakDatabaseReference.child(uid).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!isAdded || _binding == null) return
+                
+                val userStreak = snapshot.getValue(UserStreak::class.java) ?: UserStreak()
+                
+                binding.currentStreakValue.text = userStreak.currentStreak.toString()
+                binding.longestStreakValue.text = userStreak.longestStreak.toString()
+                
+                // Update streak message based on streak count
+                when {
+                    userStreak.currentStreak == 0 -> {
+                        binding.streakMessage.text = "Watch anime daily to build your streak!"
+                    }
+                    userStreak.currentStreak == 1 -> {
+                        binding.streakMessage.text = "You started your streak today! Come back tomorrow!"
+                    }
+                    userStreak.currentStreak in 2..6 -> {
+                        binding.streakMessage.text = "Great job! Keep watching daily to build your streak!"
+                    }
+                    userStreak.currentStreak in 7..13 -> {
+                        binding.streakMessage.text = "One week streak! You're becoming a true anime fan!"
+                    }
+                    userStreak.currentStreak in 14..29 -> {
+                        binding.streakMessage.text = "Two weeks+ streak! You're really dedicated!"
+                    }
+                    userStreak.currentStreak >= 30 -> {
+                        binding.streakMessage.text = "Amazing! ${userStreak.currentStreak} day streak! You're an anime master!"
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("AccountFragment", "Failed to load streak data: ${error.message}")
+            }
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -59,6 +59,8 @@
             android:layout_height="wrap_content"
             android:background="@color/gray"
             app:menu="@menu/bottom_nav"
+            app:itemTextColor="@color/white"
+            app:itemIconTint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

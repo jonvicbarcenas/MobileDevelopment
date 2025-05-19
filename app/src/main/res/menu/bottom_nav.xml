@@ -3,12 +3,18 @@
 
     <item android:title="Home"
         android:id="@+id/home"
-        android:icon="@drawable/home"/>
+        android:icon="@drawable/home"
+        android:iconTint="@color/black"
+        android:titleTextColor="@color/black"/>
     <item android:title="List"
         android:id="@+id/list"
-        android:icon="@drawable/clipboard_list"/>
+        android:icon="@drawable/clipboard_list"
+        android:iconTint="@color/black"
+        android:titleTextColor="@color/black"/>
     <item android:title="Account"
         android:id="@+id/account"
-        android:icon="@drawable/account"/>
+        android:icon="@drawable/account"
+        android:iconTint="@color/black"
+        android:titleTextColor="@color/black"/>
 
 </menu>
